@@ -1,0 +1,81 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: idx_intel_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: idx_intel
+      POSTGRES_PASSWORD: password123.
+      POSTGRES_DB: idx_intel_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U idx_intel -d idx_intel_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: idx_intel_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  waha:
+    image: devlikeapro/waha:latest
+    container_name: idx_intel_waha
+    restart: always
+    environment:
+      WAHA_LOG_LEVEL: info
+      WAHA_SESSION_ID: Ternak-Automation
+    ports:
+      - "3002:3000"
+    volumes:
+      - waha_data:/app/.media
+      - waha_sessions:/app/.sessions
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .dockerenv
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: idx_intel_backend
+    restart: always
+    environment:
+      ENVIRONMENT: production
+      DEBUG: "False"
+      REDIS_URL: redis://redis:6379/0
+      WAHA_SESSION_ID: Ternak-Automation
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    env_file:
+      - .dockerenv
+    ports:
+      - "8045:8002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - ./frontend:/frontend
+
+volumes:
+  postgres_data:
+  qdrant_data:
+  redis_data:
+  waha_data:
+  waha_sessions:

@@ -1,0 +1,141 @@
+# IDX-Intel AI — Database Architecture & Inspection Implementation Plan
+
+## Mengapa PostgreSQL, Bukan SQLite?
+
+Pemilihan **PostgreSQL 16** dibandingkan **SQLite** dalam [docker-compose.yml](file:///c:/Users/dewam/Dokumen/Project%20AI%20and%20Website/Ternak%20AI/Invest-Automation/docker-compose.yml) didasari oleh kebutuhan arsitektur sistem real-time intelligence pasar modal:
+
+1. **Konkurensi & Async I/O Tinggi (`asyncpg`)**:
+   - IDX-Intel AI menjalankan **6 scraper paralel** (`IDXAnnouncementScraper`, `GoogleNewsRSSScraper`, `CNBCRSSScraper`, `KontanRSSScraper`, `IDNFinancialsScraper`, `IPOTNewsScraper`), menerima webhook real-time dari WAHA, serta melayani perintah interaktif dari puluhan/ratusan user WhatsApp (`/cek <TICKER>`, `/summary`).
+   - **SQLite** mengunci seluruh file database saat operasi penulisan (*database is locked* error), yang menyebabkan bottleneck dan kegagalan pada saat traffic scraping atau penyiaran alert tinggi.
+   - **PostgreSQL** mendukung *Multi-Version Concurrency Control (MVCC)* dan *connection pooling* asinkron murni via driver `asyncpg`.
+2. **Deduplikasi ACID (`ON CONFLICT DO NOTHING`)**:
+   - PostgreSQL menyediakan indeks unik native pada `event_hash` (SHA-256) untuk menjamin 0% berita duplikat, bahkan saat beberapa scraper mencoba menyimpan judul berita yang sama di milidetik yang sama.
+3. **Native JSONB Storage**:
+   - Tabel `corporate_events` memiliki kolom `extracted_json` bertipe data **JSONB**, yang memungkinkan pengindeksan dan pencarian cepat untuk data kuantitatif aksi korporasi tanpa perlu parsing teks manual.
+
+---
+
+## Struktur Tabel Database (ERD & Schema)
+
+Berikut adalah **4 tabel utama** di dalam database `idx_intel_db` beserta strukturnya:
+
+### Entity Relationship Diagram (ERD)
+
+```mermaid
+erDiagram
+    users ||--o{ user_subscriptions : has
+    corporate_events ||--o{ alert_logs : generates
+    
+    users {
+        int id PK
+        string phone_number UK "E.164 WhatsApp number"
+        boolean is_active
+        boolean is_admin
+    }
+    
+    user_subscriptions {
+        int id PK
+        int user_id FK
+        string ticker "Ticker symbol e.g. BBCA"
+        boolean is_active
+    }
+    
+    corporate_events {
+        int id PK
+        string event_hash UK "SHA-256 deduplication hash"
+        string ticker "e.g. BUMI"
+        string event_type "BACKDOOR_LISTING / KONGLO_MOVE / IRRELEVANT"
+        string title
+        datetime publication_date
+        jsonb extracted_json "Quantitative Pydantic schema output"
+        string recommendation_class "STRONG_BUY_AKUMULASI / BUY / HOLD_WATCH / AVOID"
+    }
+    
+    alert_logs {
+        int id PK
+        int event_id FK
+        string phone_number
+        string status "PENDING / SENT / FAILED"
+        int retry_count
+    }
+```
+
+---
+
+### 1. Tabel `corporate_events`
+Menyimpan hasil ekstraksi aksi korporasi dari BEI dan portal berita.
+| Kolom | Tipe Data | Keterangan |
+| :--- | :--- | :--- |
+| `id` | `INTEGER` | Primary Key (Auto Increment) |
+| `event_hash` | `VARCHAR(64)` | **Unique Index** — SHA-256 dari `ticker + event_type + publication_date + title` |
+| `ticker` | `VARCHAR(10)` | Kode emiten BEI (misal: `BUMI`, `BBCA`) |
+| `event_type` | `VARCHAR(50)` | Kategori berita: `BACKDOOR_LISTING`, `KONGLO_MOVE`, atau `IRRELEVANT` |
+| `title` | `VARCHAR(500)` | Judul pengumuman / berita |
+| `source_url` | `VARCHAR(1000)` | Tautan sumber berita |
+| `publication_date`| `TIMESTAMPTZ` | Waktu publikasi berita |
+| `raw_text` | `TEXT` | Isi teks berita mentah |
+| `extracted_json` | `JSONB` | Fakta finansial kuantitatif (harga eksekusi, nilai transaksi, rasio, dll.) |
+| `impact_analysis`| `TEXT` | Ringkasan dampak strategis 2-3 kalimat (Bahasa Indonesia) |
+| `recommendation_class` | `VARCHAR(50)` | `STRONG_BUY_AKUMULASI`, `BUY`, `HOLD_WATCH`, atau `AVOID` |
+| `wa_formatted_message` | `TEXT` | Teks format markdown untuk notifikasi WhatsApp |
+
+### 2. Tabel `users`
+Menyimpan daftar nomor WhatsApp pengguna yang berinteraksi dengan bot.
+| Kolom | Tipe Data | Keterangan |
+| :--- | :--- | :--- |
+| `id` | `INTEGER` | Primary Key (Auto Increment) |
+| `phone_number` | `VARCHAR(25)` | **Unique Index** — Nomor WhatsApp format E.164 (`6281234567890`) |
+| `is_active` | `BOOLEAN` | Status aktif subscriber (`TRUE` default) |
+| `is_admin` | `BOOLEAN` | Hak akses administrator |
+
+### 3. Tabel `user_subscriptions`
+Menyimpan pemantauan saham specific ($TICKER) yang didaftarkan pengguna lewat `/subscribe`.
+| Kolom | Tipe Data | Keterangan |
+| :--- | :--- | :--- |
+| `id` | `INTEGER` | Primary Key (Auto Increment) |
+| `user_id` | `INTEGER` | **Foreign Key** -> `users.id` (ON DELETE CASCADE) |
+| `ticker` | `VARCHAR(10)` | Kode emiten yang dipantau (misal: `BREN`) |
+| `is_active` | `BOOLEAN` | Status aktif pemantauan |
+*(Unique Constraint: `(user_id, ticker)` agar tidak ada duplikasi subscription)*
+
+### 4. Tabel `alert_logs`
+Mencatat jejak pengiriman pesan notifikasi WhatsApp via WAHA HTTP API.
+| Kolom | Tipe Data | Keterangan |
+| :--- | :--- | :--- |
+| `id` | `INTEGER` | Primary Key (Auto Increment) |
+| `event_id` | `INTEGER` | **Foreign Key** -> `corporate_events.id` (ON DELETE SET NULL) |
+| `phone_number` | `VARCHAR(25)` | Nomor tujuan pengiriman WhatsApp |
+| `message_content`| `TEXT` | Isi pesan yang dikirimkan |
+| `status` | `VARCHAR(20)` | `PENDING`, `SENT`, atau `FAILED` |
+| `retry_count` | `INTEGER` | Jumlah percobaan ulang pengiriman |
+| `error_message` | `TEXT` | Detail error jika gagal dikirim |
+
+---
+
+## Proposed Changes: Tooling untuk Menampilkan Isi Tabel Database
+
+Untuk memudahkan Anda menginspeksi isi tabel database secara langsung tanpa harus masuk ke PostgreSQL CLI (`psql`), kami mengusulkan penambahan **2 tools inspeksi**:
+
+### 1. Script CLI Interaktif (`scripts/show_tables.py`)
+Script Python sederhana yang menggunakan SQLAlchemy Async untuk menampilkan ringkasan jumlah baris dan 5 data terbaru dari setiap tabel di terminal dalam format tabel.
+
+#### [NEW] [show_tables.py](file:///c:/Users/dewam/Dokumen/Project%20AI%20and%20Website/Ternak%20AI/Invest-Automation/scripts/show_tables.py)
+- Menampilkan jumlah baris di tabel `corporate_events`, `users`, `user_subscriptions`, dan `alert_logs`.
+- Menampilkan cuplikan 5 rekor terbaru dari `corporate_events` (Ticker, Event Type, Recommendation Class, dan Judul).
+
+### 2. Endpoint REST API (`GET /api/v1/monitor/tables`)
+Menambahkan endpoint baru di [app/routers/monitor.py](file:///c:/Users/dewam/Dokumen/Project%20AI%20and%20Website/Ternak%20AI/Invest-Automation/app/routers/monitor.py) agar Anda dapat melihat statistik tabel langsung dari browser (Swagger UI `http://localhost:8000/docs`).
+
+#### [MODIFY] [monitor.py](file:///c:/Users/dewam/Dokumen/Project%20AI%20and%20Website/Ternak%20AI/Invest-Automation/app/routers/monitor.py)
+- Menambahkan route `GET /api/v1/monitor/tables` yang mengembalikan JSON statistik jumlah baris per tabel dan daftar emiten yang telah diproses.
+
+---
+
+## Verification Plan
+
+### Automated Verification
+- Menjalankan script `python scripts/show_tables.py` untuk memastikan koneksi ke PostgreSQL berhasil dan tabel dapat dibaca.
+- Menjalankan `pytest tests/ -v` untuk memastikan tidak ada breaking change pada router maupun database repository.
+
+### Manual Verification
+- Membuka `http://localhost:8000/docs` dan memanggil `GET /api/v1/monitor/tables` untuk melihat isi database secara instan.

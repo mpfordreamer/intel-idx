@@ -1,0 +1,29 @@
+# Git and Version Control
+.git
+.gitignore
+
+# Python cache & virtual environments
+__pycache__
+*.py[cod]
+*$py.class
+.Python
+.venv
+venv/
+env/
+
+# Test & Linting artifacts
+.pytest_cache
+.coverage
+htmlcov/
+*.log
+tests/
+
+# IDE & OS files
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Markdown docs and local env file
+*.md
+.env

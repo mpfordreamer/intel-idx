@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect WhatsApp - IDX-Intel AI</title>
+    
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="/frontend/style.css">
+    
+    <style>
+        .connect-container {
+            max-width: 600px;
+            margin: 4rem auto;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            text-align: center;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5);
+        }
+
+        .qr-placeholder {
+            width: 300px;
+            height: 300px;
+            background: #FFFFFF;
+            margin: 2rem auto;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .qr-placeholder img {
+            max-width: 100%;
+            max-height: 100%;
+            opacity: 0.5;
+        }
+
+        .qr-loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #111;
+            font-weight: 600;
+            border-radius: 12px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--merah-primary);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .steps {
+            text-align: left;
+            margin-top: 2rem;
+            background: rgba(0,0,0,0.3);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .steps ol {
+            padding-left: 1.5rem;
+            color: var(--text-sub);
+            margin-top: 0.5rem;
+        }
+
+        .steps li {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+        <a href="index.html" class="logo">
+            <span data-i18n="nav.brand">IDX-Intel AI</span>
+            <span class="logo-badge" data-i18n="nav.badge">MERAH PUTIH</span>
+        </a>
+        <nav class="nav-links">
+            <a href="index.html" class="nav-link" data-i18n="nav.back">Kembali ke Dashboard</a>
+            <button id="langToggle" class="nav-link" style="background:none;border:none;cursor:pointer;font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:0.3rem;" onclick="toggleLanguage()">ID</button>
+        </nav>
+    </header>
+
+    <main class="dashboard-grid">
+        <div class="connect-container">
+            <h2 style="font-size: 2rem; margin-bottom: 1rem;" data-i18n="connect.title">Scan QR WhatsApp</h2>
+            <p style="color: var(--text-sub);" data-i18n="connect.desc">Bergabunglah ke dalam komunitas WhatsApp "Ternak Saham" untuk menerima notifikasi real-time dan summary harian pasar modal dari IDX-Intel AI.</p>
+            
+            <div class="qr-placeholder" id="qrContainer">
+                <div class="qr-loading-overlay" id="qrLoader">
+                    <div class="spinner"></div>
+                    <span data-i18n="connect.loading">Mengambil QR Code...</span>
+                </div>
+                <!-- WAHA QR endpoint typically exposed at /api/sessions/default/auth/qr -->
+                <img src="" alt="QR Code" id="qrImage" style="display:none;">
+            </div>
+
+            <div class="steps">
+                <strong data-i18n="connect.instructions">Cara menghubungkan:</strong>
+                <ol>
+                    <li data-i18n="connect.step1">Buka aplikasi WhatsApp atau kamera/pemindai QR di HP Anda.</li>
+                    <li data-i18n="connect.step2">Arahkan kamera untuk memindai QR Code di atas.</li>
+                    <li data-i18n="connect.step3">Klik tautan yang muncul untuk membuka WhatsApp.</li>
+                    <li data-i18n="connect.step4">Bergabunglah ke grup <b>Ternak Saham</b> untuk menerima informasi IDX Intel AI.</li>
+                </ol>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p data-i18n="footer.text">IDX-Intel AI v2.0.0</p>
+        <p style="margin-top: 0.5rem;" data-i18n="footer.copy">© 2026 Ternak Automation</p>
+    </footer>
+
+    <!-- i18n logic extension -->
+    <script src="/frontend/i18n.js"></script>
+    <script>
+        // Add specific translations for connect page to the loaded dictionaries
+        translations.id["nav.back"] = "Kembali ke Dashboard";
+        translations.id["connect.title"] = "Scan QR WhatsApp";
+        translations.id["connect.desc"] = "Bergabunglah ke dalam komunitas WhatsApp \"Ternak Saham\" untuk menerima notifikasi real-time dan summary harian pasar modal dari IDX-Intel AI.";
+        translations.id["connect.loading"] = "Mengambil QR Code...";
+        translations.id["connect.instructions"] = "Cara menghubungkan:";
+        translations.id["connect.step1"] = "Buka aplikasi WhatsApp atau kamera/pemindai QR di HP Anda.";
+        translations.id["connect.step2"] = "Arahkan kamera untuk memindai QR Code di atas.";
+        translations.id["connect.step3"] = "Klik tautan yang muncul untuk membuka WhatsApp.";
+        translations.id["connect.step4"] = "Bergabunglah ke grup <b>Ternak Saham</b> untuk menerima informasi IDX Intel AI.";
+
+        translations.en["nav.back"] = "Back to Dashboard";
+        translations.en["connect.title"] = "Scan WhatsApp QR";
+        translations.en["connect.desc"] = "Join the \"Ternak Saham\" WhatsApp community to receive real-time notifications and daily market summaries from IDX-Intel AI.";
+        translations.en["connect.loading"] = "Fetching QR Code...";
+        translations.en["connect.instructions"] = "How to join:";
+        translations.en["connect.step1"] = "Open WhatsApp or a QR scanner on your phone.";
+        translations.en["connect.step2"] = "Point your camera to scan the QR Code above.";
+        translations.en["connect.step3"] = "Tap the link that appears to open WhatsApp.";
+        translations.en["connect.step4"] = "Join the <b>Ternak Saham</b> group to receive IDX Intel AI information.";
+
+        // Mocking WAHA API QR fetch (Usually available on port 3001)
+        setTimeout(() => {
+            const qrLoader = document.getElementById('qrLoader');
+            const qrImage = document.getElementById('qrImage');
+            
+            qrLoader.style.display = 'none';
+            // Use the WhatsApp Group Invite link as the QR code data
+            const waGroupLink = encodeURIComponent("https://chat.whatsapp.com/CJVb20tuP5XLipAsG0xHib?s=cl&p=a&mlu=4");
+            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${waGroupLink}`;
+            qrImage.style.display = 'block';
+            qrImage.style.opacity = '1';
+        }, 2000);
+    </script>
+</body>
+</html>

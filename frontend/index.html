@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>IDX-Intel AI — Corporate Action Intelligence & WhatsApp Bot (Merah Putih Edition)</title>
+    <meta name="description"
+        content="Autonomous AI Agent for IDX Corporate Action Intelligence, 3-Category Classification, Top 200 Konglomerat Tracking, and Real-time WhatsApp Alerting.">
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/frontend/style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+        <a href="index.html" class="logo">
+            <span data-i18n="nav.brand">IDX-Intel AI</span>
+            <span class="logo-badge" data-i18n="nav.badge">MERAH PUTIH</span>
+        </a>
+        <nav class="nav-links">
+            <button id="langToggle" class="nav-link" style="background:none;border:none;cursor:pointer;font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:0.3rem;" onclick="toggleLanguage()">ID</button>
+            <a href="connect.html" class="btn-patriot" data-i18n="nav.getStarted">Mulai Sekarang</a>
+        </nav>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="patriot-ribbon">
+            <span>🇮🇩 INDONESIA CAPITAL MARKET INTELLIGENCE — SMART MONEY ACCUMULATION</span>
+        </div>
+        <h1 data-i18n="hero.problem">Ketinggalan Info Aksi Korporasi & Akumulasi Konglomerat?</h1>
+        <p data-i18n="hero.agitate" style="margin-bottom: 1rem; color: #FCA5A5;">
+            Info telat bikin boncos, beli di pucuk saat market maker sudah profit.
+        </p>
+        <p data-i18n="hero.solve">
+            IDX-Intel AI otomatis memantau pergerakan Top 200 Konglomerat dan menyaring noise pasar secara real-time.
+        </p>
+        <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 1rem;">
+            <a href="connect.html" class="btn-patriot" style="font-size: 1.15rem; padding: 0.85rem 2rem;" data-i18n="nav.getStarted">Mulai Sekarang</a>
+            <a href="demo.html" class="btn-patriot" style="background: transparent; border: 1px solid rgba(225, 36, 46, 0.6); color: var(--text-main); font-size: 1.15rem; padding: 0.85rem 2rem; text-decoration: none;" data-i18n="hero.demo">Demo</a>
+        </div>
+
+        <!-- SYSTEM STATUS GRID (HIDDEN FOR PRODUCTION) -->
+        <!--
+        <div class="status-grid" id="statusGrid">
+            <div class="status-item">
+                <span class="status-dot"></span>
+                <span class="status-label">PostgreSQL 16:</span>
+                <span class="status-val">ONLINE (ACID SHA-256)</span>
+            </div>
+            <div class="status-item">
+                <span class="status-dot"></span>
+                <span class="status-label">Redis 7:</span>
+                <span class="status-val">ACTIVE (5 Min Cache TTL)</span>
+            </div>
+            <div class="status-item">
+                <span class="status-dot"></span>
+                <span class="status-label">WAHA WhatsApp:</span>
+                <span class="status-val">PORT 3001 READY</span>
+            </div>
+            <div class="status-item">
+                <span class="status-dot"></span>
+                <span class="status-label">Scraper Engines:</span>
+                <span class="status-val">6 ACTIVE ENGINES</span>
+            </div>
+        </div>
+        -->
+    </section>
+
+    <!-- MAIN DASHBOARD GRID -->
+    <main class="dashboard-grid demo-hidden" id="demoMain">
+
+        <!-- LEFT COLUMN: LIVE CORPORATE ACTION CARDS -->
+        <section class="feed-section" id="feed">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span data-i18n="feed.title">Corporate Action Feed</span>
+                </h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterCards('ALL')" data-i18n="feed.filter.all">Semua</button>
+                    <button class="filter-btn" onclick="filterCards('KONGLO_MOVE')" data-i18n="feed.filter.konglo">👑 Konglomerat</button>
+                    <button class="filter-btn" onclick="filterCards('BACKDOOR_LISTING')" data-i18n="feed.filter.backdoor">🚀 Backdoor</button>
+                </div>
+            </div>
+
+            <div id="feed-container">
+                <p style="text-align: center; color: var(--text-sub); padding: 3rem;" data-i18n="feed.empty">
+                    Tidak ada dokumen korporasi yang ditemukan atau semua sudah terproses.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- LIVE PIPELINE TRIGGER BAR -->
+    <section class="trigger-section demo-hidden" id="demoTrigger">
+        <div class="trigger-info">
+            <h3 data-i18n="action.title">⚡ Mulai Pemantauan Otomatis</h3>
+            <p data-i18n="action.desc">Klik tombol di bawah untuk mengumpulkan data terbaru dari berbagai sumber berita dan menganalisisnya secara otomatis menggunakan AI.</p>
+        </div>
+        <div>
+            <button class="btn-patriot" id="triggerBtn" onclick="triggerMonitorPipeline()" data-i18n="action.btn">
+                🚀 Kumpulkan & Analisis Data Sekarang
+            </button>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p data-i18n="footer.text">IDX-Intel AI v2.0.0</p>
+        <p style="margin-top: 0.5rem;" data-i18n="footer.copy">© 2026 Ternak Automation</p>
+    </footer>
+
+    <!-- FLOATING CHAT WIDGET & FAB -->
+    <div id="floatingChatWidget" class="floating-chat-widget">
+        <div class="phone-frame">
+            <div class="wa-header">
+                <div class="wa-avatar">ID</div>
+                <div style="flex: 1;">
+                    <div class="wa-title">IDX-Intel AI CS 🇮🇩</div>
+                    <div class="wa-status">Online</div>
+                </div>
+                <button id="refreshBtn" onclick="clearChat()" style="background: none; border: none; color: #8696A0; cursor: pointer; padding: 0.5rem;" title="Clear Chat">
+                    <i class="ph ph-arrows-clockwise" style="font-size: 1.25rem;"></i>
+                </button>
+            </div>
+
+            <div class="wa-chat-area" id="chatArea">
+                <div class="wa-msg inbound">
+                    <span data-i18n="wa.cs_welcome">Halo! Saya AI Customer Service dari IDX-Intel AI & Ternak Saham.<br>Ada yang bisa saya bantu terkait fitur kami atau informasi pasar?</span>
+                    <div class="wa-time">14:00 ✓✓</div>
+                </div>
+            </div>
+
+            <form class="wa-footer" onsubmit="handleFormSubmit(event)">
+                <input type="text" id="commandInput" class="wa-input"
+                    placeholder="Ketik pertanyaan Anda..." autocomplete="off" data-i18n="wa.cs_placeholder">
+                <button type="submit" class="wa-send-btn" aria-label="Send Message">➤</button>
+            </form>
+        </div>
+    </div>
+    
+    <button class="chat-fab" onclick="toggleChat()">
+        <i class="ph ph-chat-teardrop-dots"></i>
+    </button>
+
+    <!-- INTERACTIVE JAVASCRIPT LOGIC -->
+    <script src="/frontend/i18n.js"></script>
+    <script>
+        let liveAiData = [];
+
+        // TOGGLE FLOATING CHAT WIDGET
+        function toggleChat() {
+            const widget = document.getElementById('floatingChatWidget');
+            widget.classList.toggle('active');
+            
+            if (widget.classList.contains('active')) {
+                const chatArea = document.getElementById('chatArea');
+                chatArea.scrollTop = chatArea.scrollHeight;
+                document.getElementById('commandInput').focus();
+            }
+        }
+
+        // CLEAR CHAT
+        function clearChat() {
+            const btn = document.getElementById('refreshBtn');
+            const icon = btn.querySelector('i');
+            
+            icon.classList.add('spin-anim');
+            setTimeout(() => {
+                icon.classList.remove('spin-anim');
+            }, 500);
+
+            const chatArea = document.getElementById('chatArea');
+            chatArea.innerHTML = `
+                <div class="wa-msg inbound">
+                    <span data-i18n="wa.cs_welcome">Halo! Saya AI Customer Service dari IDX-Intel AI & Ternak Saham.<br>Ada yang bisa saya bantu terkait fitur kami atau informasi pasar?</span>
+                    <div class="wa-time">14:00 ✓✓</div>
+                </div>
+            `;
+        }
+
+        // SEND COMMAND TO REAL AI BACKEND
+        async function sendSimulatedCommand(text) {
+            const chatArea = document.getElementById('chatArea');
+            const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const outboundDiv = document.createElement('div');
+            outboundDiv.className = 'wa-msg outbound';
+            outboundDiv.innerHTML = `${text}<div class="wa-time">${now}</div>`;
+            chatArea.appendChild(outboundDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+
+            // Show typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'wa-msg inbound';
+            typingDiv.innerHTML = `<i>Mengetik...</i>`;
+            chatArea.appendChild(typingDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+
+            try {
+                const response = await fetch('http://localhost:8045/api/v1/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    chatArea.removeChild(typingDiv);
+                    
+                    const replyTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const replyHtml = data.reply ? data.reply.replace(/\n/g, '<br>') : 'Tidak ada balasan.';
+                    
+                    const inboundDiv = document.createElement('div');
+                    inboundDiv.className = 'wa-msg inbound';
+                    inboundDiv.innerHTML = `${replyHtml}<div class="wa-time">${replyTime}</div>`;
+                    chatArea.appendChild(inboundDiv);
+                } else {
+                    chatArea.removeChild(typingDiv);
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'wa-msg inbound';
+                    errorDiv.innerHTML = `<i>Koneksi ke AI gagal. (Error ${response.status})</i>`;
+                    chatArea.appendChild(errorDiv);
+                }
+            } catch (error) {
+                chatArea.removeChild(typingDiv);
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'wa-msg inbound';
+                errorDiv.innerHTML = `<i>Koneksi ke server terputus.</i>`;
+                chatArea.appendChild(errorDiv);
+            }
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const input = document.getElementById('commandInput');
+            const text = input.value.trim();
+            if (text) {
+                sendSimulatedCommand(text);
+                input.value = '';
+            }
+        }
+
+        // FILTER CARDS
+        function filterCards(category) {
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const cards = document.querySelectorAll('.event-card');
+            cards.forEach(card => {
+                const cardCat = card.getAttribute('data-category');
+                if (category === 'ALL' || cardCat === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function renderCards(results) {
+            const container = document.getElementById('feed-container');
+            container.innerHTML = '';
+            
+            // Filter out IRRELEVANT news and UNKNOWN ticker
+            const filteredResults = results ? results.filter(r => r.category !== 'IRRELEVANT' && r.ticker !== 'UNKNOWN' && r.ticker !== null && r.ticker !== 'N/A' && r.ticker !== '$unknown') : [];
+
+            if (filteredResults.length === 0) {
+                container.innerHTML = `<p style="text-align: center; color: var(--text-sub); padding: 3rem;" data-i18n="feed.empty">${getTranslation('feed.empty')}</p>`;
+                return;
+            }
+
+            filteredResults.forEach(res => {
+                let badgeClass = 'category-irrelevant';
+                let recomHtml = `<span class="recom-badge recom-hold">${res.recommendation || 'HOLD_WATCH'}</span>`;
+
+                if (res.category === 'KONGLO_MOVE') {
+                    badgeClass = 'category-konglo';
+                    recomHtml = `<span class="recom-badge recom-strong">👑 ${res.recommendation || 'STRONG BUY / AKUMULASI'}</span>`;
+                } else if (res.category === 'BACKDOOR_LISTING') {
+                    badgeClass = 'category-backdoor';
+                    recomHtml = `<span class="recom-badge recom-buy">🔥 ${res.recommendation || 'BUY — STRATEGIC'}</span>`;
+                }
+
+                const article = document.createElement('article');
+                article.className = 'event-card';
+                article.setAttribute('data-category', res.category);
+
+                const langCode = currentLang === 'id' ? 'id-ID' : 'en-US';
+                const d = res.publication_date ? new Date(res.publication_date).toLocaleString(langCode, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Baru saja';
+                
+                const analysisLabel = getTranslation('card.analysis');
+                const sourceLabel = getTranslation('card.source');
+                const dateLabel = getTranslation('card.date');
+                const statusLabel = getTranslation('card.status');
+                const statusText = getTranslation('card.status.analyzed');
+                
+                const tickerStr = res.ticker ? res.ticker.replace('$', '') : 'UNKNOWN';
+                const sourceName = res.source_name ? res.source_name.replace(/_/g, ' ') : 'Sistem';
+
+                article.innerHTML = `
+                    <div class="card-top">
+                        <div class="ticker-badge">
+                            <span>$${tickerStr}</span>
+                            <span class="category-badge ${badgeClass}">${res.category}</span>
+                        </div>
+                        ${recomHtml}
+                    </div>
+                    <h3 class="event-title">${res.title}</h3>
+                    <div class="event-impact">
+                        <b>${analysisLabel}</b> ${res.impact_analysis || 'Tidak ada analisis yang diekstrak.'}
+                    </div>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">${sourceLabel}</span>
+                            <span class="meta-value">${sourceName}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">${dateLabel}</span>
+                            <span class="meta-value">${d}</span>
+                        </div>
+                        <div class="meta-item" style="text-align: right;">
+                            <span class="meta-label">${statusLabel}</span>
+                            <span class="meta-value">${statusText}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(article);
+            });
+        }
+
+
+
+        // TRIGGER MONITOR PIPELINE BUTTON
+        async function triggerMonitorPipeline() {
+            const btn = document.getElementById('triggerBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "⏳ Mengumpulkan Data & Menganalisis dengan AI...";
+            btn.disabled = true;
+
+            const container = document.getElementById('feed-container');
+            const originalContainerHTML = container.innerHTML;
+
+            // Tampilkan loading di Feed Container
+            container.innerHTML = `
+                <div style="text-align: center; padding: 4rem 2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">⏳</div>
+                    <h3 style="color: #fff; margin-bottom: 0.5rem;">AI Sedang Memproses Data...</h3>
+                    <p style="color: #94a3b8;">Sistem sedang mengambil, membaca, dan menganalisis aksi korporasi secara real-time.</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch('http://localhost:8045/api/v1/monitor', { method: 'POST' });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.data && data.data.results) {
+                        liveAiData = data.data.results;
+                        renderCards(liveAiData);
+                        alert(`✅ Pipeline AI Selesai!\n\nDiproses: ${data.data.new_documents_count} dokumen.`);
+                    } else {
+                        container.innerHTML = originalContainerHTML;
+                    }
+                } else {
+                    container.innerHTML = originalContainerHTML;
+                    alert(`ℹ️ Error pada saat fetch. HTTP Status: ${response.status}`);
+                }
+            } catch (error) {
+                container.innerHTML = originalContainerHTML;
+                alert(`ℹ️ Gagal terhubung ke backend FastAPI:\n${error.message}`);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+        async function loadExistingEvents() {
+            const container = document.getElementById('feed-container');
+
+            container.innerHTML = `
+                <div style="text-align: center; padding: 4rem 2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">⏳</div>
+                    <h3 style="color: #fff; margin-bottom: 0.5rem;">Memuat Data...</h3>
+                    <p style="color: #94a3b8;">Menarik aksi korporasi terbaru dari database.</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch('http://localhost:8045/api/v1/events');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.data && data.data.results) {
+                        liveAiData = data.data.results;
+                        renderCards(liveAiData);
+                    } else {
+                        container.innerHTML = '<p style="text-align: center; color: var(--text-sub); padding: 3rem;">Tidak ada dokumen korporasi yang ditemukan.</p>';
+                    }
+                } else {
+                    container.innerHTML = '<p style="text-align: center; color: var(--text-sub); padding: 3rem;">Gagal memuat data dari server.</p>';
+                }
+            } catch (error) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-sub); padding: 3rem;">Gagal terhubung ke server backend FastAPI.</p>';
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadExistingEvents);
+    </script>
+</body>
+
+</html>

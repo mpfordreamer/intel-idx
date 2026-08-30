@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Terminal - IDX-Intel AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/frontend/style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        .demo-container {
+            max-width: 900px;
+            margin: 2rem auto 5rem;
+            display: flex;
+            justify-content: center;
+            padding: 0 5%;
+        }
+
+        .ai-console {
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: 75vh;
+            backdrop-filter: blur(16px);
+        }
+
+        .console-header {
+            background: rgba(15, 23, 42, 0.95);
+            padding: 1.25rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid rgba(225, 36, 46, 0.35);
+        }
+
+        .console-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--merah-primary), var(--merah-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: #FFFFFF;
+            box-shadow: 0 0 15px var(--merah-glow);
+        }
+
+        .console-title {
+            flex: 1;
+        }
+
+        .console-title h2 {
+            font-size: 1.25rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34D399;
+            padding: 0.2rem 0.6rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .console-body {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            background-image: radial-gradient(circle at center, rgba(225, 36, 46, 0.03) 0%, transparent 70%);
+        }
+
+        .chat-bubble {
+            max-width: 85%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .chat-bubble.user {
+            align-self: flex-end;
+            align-items: flex-end;
+        }
+
+        .chat-bubble.ai {
+            align-self: flex-start;
+        }
+
+        .bubble-text {
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            font-size: 1rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .user .bubble-text {
+            background: linear-gradient(135deg, var(--merah-primary), var(--merah-dark));
+            color: var(--putih-pure);
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 10px 20px rgba(225, 36, 46, 0.25);
+        }
+
+        .ai .bubble-text {
+            background: rgba(30, 41, 59, 0.8);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-time {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            font-weight: 500;
+        }
+
+        .console-footer {
+            padding: 1.5rem 2rem;
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 0.5rem;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group:focus-within {
+            border-color: var(--merah-primary);
+            box-shadow: 0 0 15px rgba(225, 36, 46, 0.2);
+        }
+
+        .console-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-main);
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            padding: 0.75rem 1rem;
+        }
+
+        .console-btn {
+            background: var(--merah-primary);
+            border: none;
+            color: #FFFFFF;
+            padding: 0 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .console-btn:hover {
+            background: var(--merah-dark);
+            box-shadow: 0 0 15px var(--merah-glow);
+        }
+        
+        /* Inner Card style specifically for demo chat */
+        .embedded-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--merah-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 0.5rem;
+            width: 100%;
+            max-width: 500px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+        <a href="index.html" class="logo">
+            <span data-i18n="nav.brand">IDX-Intel AI</span>
+            <span class="logo-badge" data-i18n="nav.badge">MERAH PUTIH</span>
+        </a>
+        <nav class="nav-links">
+            <a href="index.html" class="nav-link">Kembali ke Dashboard</a>
+            <button id="langToggle" class="nav-link" style="background:none;border:none;cursor:pointer;font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:0.3rem;" onclick="toggleLanguage()">ID</button>
+        </nav>
+    </header>
+
+    <main class="demo-container">
+        <div class="ai-console">
+            <div class="console-header">
+                <div class="console-icon">
+                    <i class="ph ph-cpu"></i>
+                </div>
+                <div class="console-title">
+                    <h2 data-i18n="demo.terminal_title">Terminal Intelligence</h2><span class="status-badge">SYSTEM ONLINE</span>
+                    <div style="font-size: 0.85rem; color: var(--text-sub); margin-top: 0.2rem;" data-i18n="demo.terminal_subtitle">Model: Qwen-3.5-Instruct (Fine-Tuned)</div>
+                </div>
+            </div>
+
+            <div class="console-body" id="chatArea">
+                <div class="chat-bubble ai">
+                    <div class="bubble-text" data-i18n="demo.init_msg">Inisialisasi sistem berhasil. Memuat data pasar terbaru...<br><br>💡 Ketik <b>/cek BUMI</b> atau <b>/cek BBCA</b> untuk melihat simulasi output <i>Corporate Action</i> secara instan.</div>
+                    <div class="chat-time" id="time1"></div>
+                </div>
+                
+                <div class="chat-bubble user">
+                    <div class="bubble-text" data-i18n="demo.user_msg">Halo AI, apakah ada sentimen terbaru mengenai emiten batu bara?</div>
+                    <div class="chat-time" id="time2"></div>
+                </div>
+                
+                <div class="chat-bubble ai">
+                    <div class="bubble-text" data-i18n="demo.ai_msg">Halo! Berdasarkan pantauan data real-time, sektor energi khususnya batu bara menunjukkan adanya akumulasi bertahap. Namun, silakan ketik perintah spesifik seperti <b>/cek BUMI</b> untuk melihat detail analisis dari radar Konglomerat kami.</div>
+                    <div class="chat-time" id="time3"></div>
+                </div>
+            </div>
+
+            <form class="console-footer" onsubmit="handleDemoSubmit(event)">
+                <div class="input-group">
+                    <input type="text" id="demoInput" class="console-input" placeholder="Ketik perintah (contoh: /cek BUMI)" autocomplete="off" data-i18n="demo.input_placeholder">
+                    <button type="submit" class="console-btn">
+                        <span data-i18n="demo.btn_execute">Eksekusi</span>
+                        <i class="ph ph-paper-plane-right"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script src="/frontend/i18n.js"></script>
+    <script>
+        // Set initial times
+        const now = new Date();
+        document.getElementById('time1').innerText = new Date(now.getTime() - 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('time2').innerText = new Date(now.getTime() - 45000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('time3').innerText = new Date(now.getTime() - 40000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        function handleDemoSubmit(event) {
+            event.preventDefault();
+            const input = document.getElementById('demoInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            const chatArea = document.getElementById('chatArea');
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            // User Message
+            const userHtml = '<div class="chat-bubble user" style="animation: fadeIn 0.3s ease-out;"><div class="bubble-text">' + text + '</div><div class="chat-time">' + timeStr + '</div></div>';
+            chatArea.insertAdjacentHTML('beforeend', userHtml);
+            input.value = '';
+            chatArea.scrollTop = chatArea.scrollHeight;
+
+            // Simulate Loading
+            const typingId = 'typing-' + Date.now();
+            const analyzingText = getTranslation('demo.analyzing');
+            const typingHtml = '<div class="chat-bubble ai" id="' + typingId + '"><div class="bubble-text" data-i18n="demo.analyzing">' + analyzingText + '</div></div>';
+            chatArea.insertAdjacentHTML('beforeend', typingHtml);
+            chatArea.scrollTop = chatArea.scrollHeight;
+
+            setTimeout(() => {
+                const typingEl = document.getElementById(typingId);
+                if(typingEl) typingEl.remove();
+
+                const cmd = text.toLowerCase();
+                let replyHtml = '';
+
+                if (cmd === '/cek bumi') {
+                    replyHtml = '<div class="bubble-text" style="background: transparent; border: none; padding: 0;">' +
+                        '<span data-i18n="demo.bumi_intro">' + getTranslation('demo.bumi_intro') + '</span>' +
+                        '<div class="embedded-card">' +
+                            '<div class="card-top" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">' +
+                                '<div class="ticker-badge" style="font-size:1.2rem; font-weight:800;">' +
+                                    '<span>$BUMI</span>' +
+                                    '<span class="category-badge category-konglo" style="padding: 0.25rem 0.5rem; border-radius:4px; font-size:0.7rem; margin-left:0.5rem; background:rgba(220, 38, 38, 0.2); color:#F87171; border: 1px solid rgba(220, 38, 38, 0.5);">KONGLO_MOVE</span>' +
+                                '</div>' +
+                                '<span class="recom-badge recom-strong" style="background: linear-gradient(135deg, #DC2626, #991B1B); color: #fff; padding: 0.3rem 0.75rem; border-radius: 50px; font-size: 0.75rem; font-weight:700;">👑 STRONG BUY</span>' +
+                            '</div>' +
+                            '<h3 class="event-title" style="font-size:1.1rem; margin-bottom:0.75rem;" data-i18n="demo.bumi_title">' + getTranslation('demo.bumi_title') + '</h3>' +
+                            '<div class="event-impact" style="background: rgba(0,0,0,0.3); padding:0.85rem; border-radius:8px; border-left:2px solid var(--merah-primary); font-size:0.9rem; color:var(--text-sub);" data-i18n="demo.bumi_analysis">' + getTranslation('demo.bumi_analysis') + '</div>' +
+                        '</div>' +
+                    '</div>';
+                } else if (cmd === '/cek bbca') {
+                    replyHtml = '<div class="bubble-text" style="background: transparent; border: none; padding: 0;">' +
+                        '<span data-i18n="demo.bbca_intro">' + getTranslation('demo.bbca_intro') + '</span>' +
+                        '<div class="embedded-card" style="border-color: #34D399;">' +
+                            '<div class="card-top" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">' +
+                                '<div class="ticker-badge" style="font-size:1.2rem; font-weight:800;">' +
+                                    '<span>$BBCA</span>' +
+                                    '<span class="category-badge" style="padding: 0.25rem 0.5rem; border-radius:4px; font-size:0.7rem; margin-left:0.5rem; background:rgba(100, 116, 139, 0.2); color:#94A3B8; border: 1px solid rgba(100, 116, 139, 0.5);">IRRELEVANT</span>' +
+                                '</div>' +
+                                '<span class="recom-badge recom-hold" style="background: rgba(245, 158, 11, 0.2); color: #FBBF24; padding: 0.3rem 0.75rem; border-radius: 50px; font-size: 0.75rem; font-weight:700; border: 1px solid rgba(245, 158, 11, 0.4);">HOLD WATCH</span>' +
+                            '</div>' +
+                            '<h3 class="event-title" style="font-size:1.1rem; margin-bottom:0.75rem;" data-i18n="demo.bbca_title">' + getTranslation('demo.bbca_title') + '</h3>' +
+                            '<div class="event-impact" style="background: rgba(0,0,0,0.3); padding:0.85rem; border-radius:8px; border-left:2px solid #FBBF24; font-size:0.9rem; color:var(--text-sub);" data-i18n="demo.bbca_analysis">' + getTranslation('demo.bbca_analysis') + '</div>' +
+                        '</div>' +
+                    '</div>';
+                } else {
+                    replyHtml = '<div class="bubble-text" data-i18n="demo.unknown_cmd">' + getTranslation('demo.unknown_cmd') + '</div>';
+                }
+
+                const aiHtml = '<div class="chat-bubble ai" style="animation: fadeIn 0.3s ease-out;">' + replyHtml + '<div class="chat-time">' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</div></div>';
+                chatArea.insertAdjacentHTML('beforeend', aiHtml);
+                chatArea.scrollTop = chatArea.scrollHeight;
+
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
