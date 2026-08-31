@@ -15,12 +15,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="/frontend/style.css">
+    <link rel="stylesheet" href="./style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
 <body>
-
     <!-- NAVBAR -->
     <header class="navbar">
         <a href="index.html" class="logo">
@@ -29,62 +28,177 @@
         </a>
         <nav class="nav-links">
             <button id="langToggle" class="nav-link" style="background:none;border:none;cursor:pointer;font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:0.3rem;" onclick="toggleLanguage()">ID</button>
-            <a href="connect.html" class="btn-patriot" data-i18n="nav.getStarted">Mulai Sekarang</a>
+            <a href="connect.html" class="btn-patriot" data-i18n="nav.getStarted">Gabung Sekarang</a>
         </nav>
     </header>
 
     <!-- HERO SECTION -->
-    <section class="hero">
+    <section class="hero" id="hero">
         <div class="patriot-ribbon">
             <span>🇮🇩 INDONESIA CAPITAL MARKET INTELLIGENCE — SMART MONEY ACCUMULATION</span>
         </div>
-        <h1 data-i18n="hero.problem">Ketinggalan Info Aksi Korporasi & Akumulasi Konglomerat?</h1>
-        <p data-i18n="hero.agitate" style="margin-bottom: 1rem; color: #FCA5A5;">
-            Info telat bikin boncos, beli di pucuk saat market maker sudah profit.
+        <h1 data-i18n="hero.title">Bangun Sistem yang Mengubah Informasi Pasar Menjadi Keputusan Investasi yang Tepat.</h1>
+        <p data-i18n="hero.subtitle">
+            IDX-Intel AI memantau pergerakan pasar saham dan keterbukaan informasi BEI 24/7, menyaring ribuan berita, dan mengirimkan ringkasan penting langsung ke WhatsApp Anda.
         </p>
-        <p data-i18n="hero.solve">
-            IDX-Intel AI otomatis memantau pergerakan Top 200 Konglomerat dan menyaring noise pasar secara real-time.
-        </p>
-        <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 1rem;">
-            <a href="connect.html" class="btn-patriot" style="font-size: 1.15rem; padding: 0.85rem 2rem;" data-i18n="nav.getStarted">Mulai Sekarang</a>
-            <a href="demo.html" class="btn-patriot" style="background: transparent; border: 1px solid rgba(225, 36, 46, 0.6); color: var(--text-main); font-size: 1.15rem; padding: 0.85rem 2rem; text-decoration: none;" data-i18n="hero.demo">Demo</a>
+        <div class="hero-actions">
+            <a href="connect.html" class="btn-patriot" data-i18n="hero.btn.primary">Gabung Sekarang (Gratis)</a>
+            <a href="demo.html" class="btn-secondary" data-i18n="hero.btn.secondary">Coba Demo</a>
         </div>
-
-        <!-- SYSTEM STATUS GRID (HIDDEN FOR PRODUCTION) -->
-        <!--
-        <div class="status-grid" id="statusGrid">
-            <div class="status-item">
-                <span class="status-dot"></span>
-                <span class="status-label">PostgreSQL 16:</span>
-                <span class="status-val">ONLINE (ACID SHA-256)</span>
-            </div>
-            <div class="status-item">
-                <span class="status-dot"></span>
-                <span class="status-label">Redis 7:</span>
-                <span class="status-val">ACTIVE (5 Min Cache TTL)</span>
-            </div>
-            <div class="status-item">
-                <span class="status-dot"></span>
-                <span class="status-label">WAHA WhatsApp:</span>
-                <span class="status-val">PORT 3001 READY</span>
-            </div>
-            <div class="status-item">
-                <span class="status-dot"></span>
-                <span class="status-label">Scraper Engines:</span>
-                <span class="status-val">6 ACTIVE ENGINES</span>
-            </div>
-        </div>
-        -->
     </section>
 
-    <!-- MAIN DASHBOARD GRID -->
-    <main class="dashboard-grid demo-hidden" id="demoMain">
+    <!-- PROBLEM SECTION -->
+    <section class="problem-section" id="problem">
+        <h2 class="section-title" data-i18n="prob.title">Anda bukan kekurangan informasi, masalah anda adalah:</h2>
+        <ul class="problem-list">
+            <li><i class="ph ph-x-circle" style="color: #ef4444;"></i> <span data-i18n="prob.1">Informasi terlambat sampai: Berita baru Anda ketahui saat pergerakan harga saham sudah selesai.</span></li>
+            <li><i class="ph ph-x-circle" style="color: #ef4444;"></i> <span data-i18n="prob.2">Keputusan investasi masih sering dibuat berdasarkan feeling dan kepanikan pasar (FOMO).</span></li>
+            <li><i class="ph ph-x-circle" style="color: #ef4444;"></i> <span data-i18n="prob.3">Tenggelam dalam ratusan dokumen laporan: Tidak punya waktu membaca laporan keuangan dan keterbukaan informasi yang tebal.</span></li>
+            <li><i class="ph ph-x-circle" style="color: #ef4444;"></i> <span data-i18n="prob.4">Tidak memiliki sistem otomatis untuk memantau pergerakan dan aktivitas saham penting secara real-time.</span></li>
+            <li><i class="ph ph-x-circle" style="color: #ef4444;"></i> <span data-i18n="prob.5">Terjebak dalam kebisingan grup dan rumor yang tidak berbasis data nyata.</span></li>
+        </ul>
+    </section>
 
+    <!-- FILTER SECTION -->
+    <section class="filter-section" id="filter">
+        <h2 class="section-title" data-i18n="filter.title">IDX-Intel AI bukan untuk semua orang.</h2>
+        
+        <div class="filter-grid">
+            <div class="filter-card not-for-you">
+                <h3 data-i18n="filter.not.title">IDX-Intel AI bukan untuk Anda jika:</h3>
+                <ul>
+                    <li><i class="ph ph-x" style="color: #ef4444;"></i> <span data-i18n="filter.not.1">Mencari sinyal beli instan tanpa analisa.</span></li>
+                    <li><i class="ph ph-x" style="color: #ef4444;"></i> <span data-i18n="filter.not.2">Ingin cepat kaya dalam semalam.</span></li>
+                    <li><i class="ph ph-x" style="color: #ef4444;"></i> <span data-i18n="filter.not.3">Tidak mau memahami data dan pergerakan pasar.</span></li>
+                </ul>
+            </div>
+            
+            <div class="filter-card for-you">
+                <h3 data-i18n="filter.yes.title">IDX-Intel AI cocok jika Anda:</h3>
+                <ul>
+                    <li><i class="ph ph-check" style="color: #22c55e;"></i> <span data-i18n="filter.yes.1">Ingin memantau aktivitas saham dan pergerakan pasar secara objektif.</span></li>
+                    <li><i class="ph ph-check" style="color: #22c55e;"></i> <span data-i18n="filter.yes.2">Ingin mendapatkan ringkasan data penting dalam hitungan detik.</span></li>
+                    <li><i class="ph ph-check" style="color: #22c55e;"></i> <span data-i18n="filter.yes.3">Serius membangun keputusan investasi berbasis data dan teknologi AI.</span></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="connect.html" class="btn-patriot" data-i18n="filter.btn">Gabung Komunitas Alert</a>
+        </div>
+    </section>
+
+    <!-- DELIVERABLES SECTION -->
+    <section class="deliverables-section" id="deliverables">
+        <div class="section-badge" data-i18n="deliv.badge">FITUR UTAMA</div>
+        <h2 class="section-title" data-i18n="deliv.title">Apa yang akan Anda dapatkan?</h2>
+        
+        <div class="deliverables-grid">
+            <div class="deliverable-card">
+                <div class="icon-wrapper"><i class="ph ph-whatsapp-logo"></i></div>
+                <h3 data-i18n="deliv.1.title">Ringkasan Aktivitas Saham & Notifikasi WhatsApp (24/7)</h3>
+                <p data-i18n="deliv.1.desc">Setiap kali ada pengumuman penting bursa atau aktivitas saham yang signifikan, sistem AI langsung merangkum intinya dan mengirimkannya ke WhatsApp Anda.</p>
+            </div>
+            <div class="deliverable-card">
+                <div class="icon-wrapper"><i class="ph ph-file-text"></i></div>
+                <h3 data-i18n="deliv.2.title">Analisis Dokumen & Berita Saham Otomatis</h3>
+                <p data-i18n="deliv.2.desc">AI membaca dan mengekstrak poin-poin krusial dari pengumuman pasar sehingga Anda tidak perlu membuang waktu membaca dokumen berpuluh-puluh halaman.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- AUTHORITY SECTION -->
+    <section class="authority-section" id="authority">
+        <div class="section-badge" data-i18n="auth.badge">DIBANGUN OLEH</div>
+        <h2 class="section-title" data-i18n="auth.title">Ternak AI & IDX Intelligence Lab</h2>
+        <p class="auth-desc" data-i18n="auth.desc">Dibangun oleh praktisi pasar modal dan AI engineer yang memahami seluk-beluk keterbukaan informasi bursa. Sistem ini dirancang untuk bekerja secara otomatis, terstruktur, dan akurat tanpa rekayasa data.</p>
+    </section>
+
+    <!-- PRICING SECTION -->
+    <section class="pricing-section" id="pricing">
+        <h2 class="section-title" data-i18n="price.title">Daftar & Gabung Sekarang</h2>
+        <div class="pricing-card">
+            <div class="pricing-badge" data-i18n="price.badge">AKSES PENUH · SEUMUR HIDUP</div>
+            <div class="pricing-price">
+                <span class="strikethrough" data-i18n="price.normal">Rp 999.000</span>
+                <span class="free-price" data-i18n="price.free">Rp 0</span> <span class="free-tag" data-i18n="price.free.tag">(GRATIS / FREE)</span>
+            </div>
+            <ul class="pricing-features">
+                <li><i class="ph ph-check-circle"></i> <span data-i18n="price.check.1">Pemantauan Keterbukaan Informasi BEI & Aktivitas Saham 24/7</span></li>
+                <li><i class="ph ph-check-circle"></i> <span data-i18n="price.check.2">Notifikasi real-time via WhatsApp langsung ke ponsel Anda</span></li>
+                <li><i class="ph ph-check-circle"></i> <span data-i18n="price.check.3">Analisis cerdas atas aktivitas saham dan pergerakan pasar modal</span></li>
+                <li><i class="ph ph-check-circle"></i> <span data-i18n="price.check.4">Akses tanya jawab interaktif ke AI Customer Service seputar pasar</span></li>
+            </ul>
+            <a href="connect.html" class="btn-patriot btn-block" data-i18n="price.btn">Daftar & Gabung WhatsApp Gratis</a>
+        </div>
+    </section>
+
+    <!-- FAQ SECTION -->
+    <section class="faq-section" id="faq">
+        <h2 class="section-title" data-i18n="faq.title">FAQ</h2>
+        <div class="faq-accordion">
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-i18n="faq.q1">Apakah IDX-Intel AI berbayar?</span>
+                    <i class="ph ph-caret-down"></i>
+                </button>
+                <div class="faq-answer">
+                    <p data-i18n="faq.a1">Tidak. Saat ini akses 100% GRATIS (dari nilai normal Rp 999.000). Anda bisa langsung bergabung ke grup WhatsApp kami.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-i18n="faq.q2">Apakah ini grup sinyal saham?</span>
+                    <i class="ph ph-caret-down"></i>
+                </button>
+                <div class="faq-answer">
+                    <p data-i18n="faq.a2">Bukan. IDX-Intel AI adalah sistem pemantau data dan penyaring informasi bursa, membantu Anda mendapatkan fakta lebih cepat dan objektif.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-i18n="faq.q3">Dari mana data diambil?</span>
+                    <i class="ph ph-caret-down"></i>
+                </button>
+                <div class="faq-answer">
+                    <p data-i18n="faq.a3">Sistem memantau pengumuman resmi Bursa Efek Indonesia (BEI) dan media finansial terpercaya secara real-time.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-i18n="faq.q4">Bagaimana cara bergabung?</span>
+                    <i class="ph ph-caret-down"></i>
+                </button>
+                <div class="faq-answer">
+                    <p data-i18n="faq.a4">Cukup klik tombol Gabung Sekarang, scan QR Code atau gunakan link undangan grup WhatsApp yang disediakan.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span data-i18n="faq.q5">Apakah saya bisa bertanya ke AI?</span>
+                    <i class="ph ph-caret-down"></i>
+                </button>
+                <div class="faq-answer">
+                    <p data-i18n="faq.a5">Ya, Anda bisa berinteraksi melalui tombol chat di pojok kanan bawah untuk bertanya seputar informasi bursa.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CLOSER SECTION -->
+    <section class="closer-section" id="closer">
+        <div class="section-badge" data-i18n="close.badge">MULAI HARI INI</div>
+        <h2 class="section-title" data-i18n="close.title">Bangun kebiasaan investasi Anda, perlahan tapi pasti.</h2>
+        <a href="connect.html" class="btn-patriot" data-i18n="close.btn">Gabung IDX-Intel AI Sekarang</a>
+    </section>
+
+    <!-- MAIN DASHBOARD GRID (FEED) -->
+    <main class="dashboard-grid demo-hidden" id="demoMain">
         <!-- LEFT COLUMN: LIVE CORPORATE ACTION CARDS -->
         <section class="feed-section" id="feed">
             <div class="section-header">
                 <h2 class="section-title">
-                    <span data-i18n="feed.title">Corporate Action Feed</span>
+                    <span data-i18n="feed.title">Live Corporate Action Feed</span>
                 </h2>
                 <div class="filter-buttons">
                     <button class="filter-btn active" onclick="filterCards('ALL')" data-i18n="feed.filter.all">Semua</button>
@@ -99,7 +213,6 @@
                 </p>
             </div>
         </section>
-
     </main>
 
     <!-- LIVE PIPELINE TRIGGER BAR -->
@@ -117,8 +230,8 @@
 
     <!-- FOOTER -->
     <footer class="footer">
-        <p data-i18n="footer.text">IDX-Intel AI v2.0.0</p>
-        <p style="margin-top: 0.5rem;" data-i18n="footer.copy">© 2026 Ternak Automation</p>
+        <p data-i18n="footer.tagline">IDX-Intel AI · Platform Intelijen Pasar Saham Indonesia</p>
+        <p style="margin-top: 0.5rem;" data-i18n="footer.copy">© 2026 Ternak Automation. All rights reserved.</p>
     </footer>
 
     <!-- FLOATING CHAT WIDGET & FAB -->
@@ -155,7 +268,7 @@
     </button>
 
     <!-- INTERACTIVE JAVASCRIPT LOGIC -->
-    <script src="/frontend/i18n.js"></script>
+    <script src="./i18n.js"></script>
     <script>
         let liveAiData = [];
 
@@ -414,7 +527,40 @@
             }
         }
 
-        window.addEventListener('DOMContentLoaded', loadExistingEvents);
+        window.addEventListener('DOMContentLoaded', () => {
+            loadExistingEvents();
+            
+            // FAQ Accordion Logic
+            const faqItems = document.querySelectorAll('.faq-item');
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                question.addEventListener('click', () => {
+                    const isActive = item.classList.contains('active');
+                    
+                    // Close all others
+                    faqItems.forEach(otherItem => {
+                        otherItem.classList.remove('active');
+                    });
+                    
+                    if (!isActive) {
+                        item.classList.add('active');
+                    }
+                });
+            });
+
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
     </script>
 </body>
 
