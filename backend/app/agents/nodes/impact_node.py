@@ -36,12 +36,15 @@ async def impact_node(state: AgentState) -> dict:
     extracted = state.get("extracted_data", {})
 
     try:
+        # Enable thinking if it's from BEI official scraper
+        is_bei = doc.source_name == "BEI_OFFICIAL"
+
         llm = ChatOpenAI(
             model=settings.LLM_MODEL,
             temperature=0,
             api_key=settings.ORCAROUTER_API_KEY,
             base_url=settings.LLM_MODEL_URL,
-            model_kwargs={"extra_body": {"enable_thinking": False}}
+            extra_body={"enable_thinking": is_bei}
         )
 
         prompt_messages = [

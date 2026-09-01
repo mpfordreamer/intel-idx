@@ -23,8 +23,9 @@ Your task is to classify an incoming news article, official announcement, or rum
    - Any strong indication of massive accumulation, institutional buying, or significant strategic investment even if the specific group name is not explicitly mentioned in the text.
 
 3. "SURPRISE_FUNDAMENTAL":
-   - A previously loss-making company for years suddenly generates a net profit (turnaround).
-   - Net profit skyrockets unnaturally or exceeds expectations (e.g., increases >200% YoY).
+   - Financial reports or earnings announcements showing net profit (laba bersih), revenue, or fundamental improvements.
+   - A previously loss-making company generates a net profit (turnaround).
+   - Net profit increases significantly or exceeds expectations.
 
 4. "BIG_CONTRACT":
    - The company wins a tender, new project, or joint venture with a fantastic value (approaching or exceeding the company's own Market Cap, e.g., > 50 Billion Rupiah or equivalent in USD).
@@ -131,7 +132,7 @@ Judul: {title}
     if event_type == "BACKDOOR_LISTING":
         category_label = "Backdoor Listing / Injeksi Aset"
     elif event_type == "SURPRISE_FUNDAMENTAL":
-        category_label = "Surprise Fundamental / Laba Meroket"
+        category_label = "Laporan Keuangan / Keuntungan Laba"
     elif event_type == "BIG_CONTRACT":
         category_label = "Big Contract / Proyek Jumbo"
 

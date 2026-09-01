@@ -57,7 +57,16 @@ def _fallback_keyword_classify(ticker: str, title: str, text: str) -> EventClass
             reasoning="Keyword-based detection of Top 200 Konglomerat / Smart Money accumulation.",
         )
 
-    # 3. Otherwise IRRELEVANT (Aturan Ketat)
+    # 3. Earnings / Financial Report keywords
+    earnings_kws = ["laba bersih", "keuntungan", "laporan keuangan", "kinerja keuangan", "laba berjalan", "rugi bersih"]
+    if any(kw in content_lower for kw in earnings_kws):
+        return EventClassificationResult(
+            category="SURPRISE_FUNDAMENTAL",
+            confidence_score=0.90,
+            reasoning="Keyword-based detection of Financial / Earnings report.",
+        )
+
+    # 4. Otherwise IRRELEVANT (Aturan Ketat)
     return EventClassificationResult(
         category="IRRELEVANT",
         confidence_score=0.95,
@@ -74,12 +83,15 @@ async def classifier_node(state: AgentState) -> dict:
     doc = state["document"]
 
     try:
+        # Enable thinking if it's from BEI official scraper
+        is_bei = doc.source_name == "BEI_OFFICIAL"
+
         llm = ChatOpenAI(
             model=settings.LLM_MODEL,
             temperature=0,
             api_key=settings.ORCAROUTER_API_KEY,
             base_url=settings.LLM_MODEL_URL,
-            model_kwargs={"extra_body": {"enable_thinking": False}}
+            extra_body={"enable_thinking": is_bei}
         ).with_structured_output(EventClassificationResult)
 
         prompt_messages = [
