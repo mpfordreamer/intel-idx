@@ -68,7 +68,8 @@ async def recommendation_node(state: AgentState) -> dict:
             temperature=0,
             api_key=settings.ORCAROUTER_API_KEY,
             base_url=settings.LLM_MODEL_URL,
-            extra_body={"enable_thinking": is_bei}
+            extra_body={"enable_thinking": is_bei},
+            timeout=600
         )
         prompt_messages = [
             SystemMessage(content=RECOMMENDATION_SYSTEM_PROMPT),

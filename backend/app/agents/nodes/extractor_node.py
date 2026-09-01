@@ -96,7 +96,8 @@ async def extractor_node(state: AgentState) -> dict:
             temperature=0.2,
             api_key=settings.ORCAROUTER_API_KEY,
             base_url=settings.LLM_MODEL_URL,
-            extra_body={"enable_thinking": is_bei}
+            extra_body={"enable_thinking": is_bei},
+            timeout=600
         ).with_structured_output(ExtractedEventData)
 
         prompt_messages = [

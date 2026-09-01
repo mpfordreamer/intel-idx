@@ -1,5 +1,6 @@
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
+import random
 from app.agents.state import AgentState
 from app.config import get_settings
 from app.services.prompt import IMPACT_SYSTEM_PROMPT
@@ -20,10 +21,13 @@ def _fallback_impact_analysis(ticker: str, category: str, extracted: dict | None
             f"Injeksi aset dan perubahan kegiatan usaha berpotensi mengubah prospek fundamental ${ticker.upper()} secara drastis. "
             f"Dukungan strategis dari {investor} memberikan kepastian permodalan baru bagi ekspansi jangka panjang."
         )
-    return (
-        f"Masuknya {investor} memperkuat struktur permodalan dan berpotensi memangkas beban keuangan emiten secara signifikan. "
-        f"Sinyal akumulasi jangka panjang dari institusi dan 'smart money'."
-    )
+    variations = [
+        f"Masuknya {investor} memperkuat struktur permodalan dan berpotensi memangkas beban keuangan emiten secara signifikan. Sinyal akumulasi jangka panjang dari institusi dan 'smart money'.",
+        f"Kehadiran {investor} memberikan katalis positif bagi likuiditas dan postur neraca perusahaan. Hal ini mengindikasikan tingginya kepercayaan investor institusi terhadap prospek bisnis ke depan.",
+        f"Suntikan dana dan dukungan strategis dari {investor} diharapkan dapat mengoptimalkan efisiensi operasional emiten. Langkah ini sering dikaitkan dengan pergerakan 'value investing' dari pelaku pasar besar.",
+        f"Keterlibatan {investor} mencerminkan sinyal penguatan fundamental jangka panjang. Ini menjadi indikator awal adanya potensi rotasi arus modal strategis ke dalam emiten terkait."
+    ]
+    return random.choice(variations)
 
 
 async def impact_node(state: AgentState) -> dict:
@@ -44,7 +48,8 @@ async def impact_node(state: AgentState) -> dict:
             temperature=0,
             api_key=settings.ORCAROUTER_API_KEY,
             base_url=settings.LLM_MODEL_URL,
-            extra_body={"enable_thinking": is_bei}
+            extra_body={"enable_thinking": is_bei},
+            timeout=600
         )
 
         prompt_messages = [
