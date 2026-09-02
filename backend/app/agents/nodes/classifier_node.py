@@ -86,14 +86,31 @@ async def classifier_node(state: AgentState) -> dict:
         # Enable thinking if it's from BEI official scraper
         is_bei = doc.source_name == "BEI_OFFICIAL"
 
+        # === CPU-Optimized Configuration ===
+        # We temporarily disable "thinking" mode because the VRAM is full
+        # and Ollama runs on CPU. Thinking on CPU takes too long.
         llm = ChatOpenAI(
             model=settings.LLM_MODEL,
             temperature=0,
             api_key=settings.ORCAROUTER_API_KEY,
             base_url=settings.LLM_MODEL_URL,
-            extra_body={"enable_thinking": is_bei},
-            timeout=600
+            timeout=600,
+            max_retries=0
         ).with_structured_output(EventClassificationResult)
+        
+        # === ARCHIVED: GPU / Thinking Mode Configuration ===
+        # To re-activate thinking mode when GPU VRAM is free, comment out the `llm` block above 
+        # and uncomment the block below. Note: Ollama automatically switches to GPU if VRAM is available.
+        #
+        # llm = ChatOpenAI(
+        #     model=settings.LLM_MODEL,
+        #     temperature=0,
+        #     api_key=settings.ORCAROUTER_API_KEY,
+        #     base_url=settings.LLM_MODEL_URL,
+        #     extra_body={"enable_thinking": is_bei},
+        #     timeout=600,
+        #     max_retries=0
+        # ).with_structured_output(EventClassificationResult)
 
         prompt_messages = [
             SystemMessage(content=CLASSIFIER_SYSTEM_PROMPT),

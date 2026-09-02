@@ -20,6 +20,14 @@ scrapers = [
     KontanRSSScraper()
 ]
 
+async def _process_docs_background(docs):
+    """Processes a list of documents sequentially in the background to not block the scheduler."""
+    for doc in docs:
+        try:
+            await AgentExecutionService.process_document(doc)
+        except Exception as e:
+            logger.error(f"AI Pipeline failed for {doc.ticker}", error=str(e))
+
 async def run_all_scrapers():
     """
     Executes all active scrapers asynchronously and collects the results.
@@ -33,6 +41,8 @@ async def run_all_scrapers():
     wita_tz = timezone(timedelta(hours=8))
     today_wita = datetime.now(wita_tz).date()
 
+    docs_to_process = []
+
     for idx, res in enumerate(results):
         if isinstance(res, Exception):
             logger.error(f"Scraper {scrapers[idx].source_name} failed with exception: {res}")
@@ -40,17 +50,19 @@ async def run_all_scrapers():
             logger.info(f"Scraper {scrapers[idx].source_name} scraped {len(res)} documents.")
             total_docs += len(res)
             
-            # Process each document through the AI intelligence pipeline
+            # Filter by WITA "today"
             for doc in res:
                 try:
-                    # Filter by WITA "today"
                     doc_date_wita = doc.publication_date.astimezone(wita_tz).date()
-                    if doc_date_wita < today_wita:
-                        continue
-                        
-                    await AgentExecutionService.process_document(doc)
+                    if doc_date_wita >= today_wita:
+                        docs_to_process.append(doc)
                 except Exception as e:
-                    logger.error(f"AI Pipeline failed for {doc.ticker}", error=str(e))
+                    logger.warning(f"Failed to parse date for {doc.ticker}: {e}")
+
+    if docs_to_process:
+        logger.info(f"Dispatching {len(docs_to_process)} documents to background AI processing task.")
+        asyncio.create_task(_process_docs_background(docs_to_process))
+        
     logger.info(f"Finished scraping cycle. Total documents fetched: {total_docs}")
 
 # Global scheduler instance
