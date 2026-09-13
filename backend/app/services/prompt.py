@@ -132,7 +132,7 @@ Judul: {title}
     if event_type == "BACKDOOR_LISTING":
         category_label = "Backdoor Listing / Injeksi Aset"
     elif event_type == "SURPRISE_FUNDAMENTAL":
-        category_label = "Laporan Keuangan / Keuntungan Laba"
+        category_label = "Laporan Keuangan / Fundamental"
     elif event_type == "BIG_CONTRACT":
         category_label = "Big Contract / Proyek Jumbo"
 

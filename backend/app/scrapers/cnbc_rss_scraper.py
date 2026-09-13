@@ -46,34 +46,58 @@ class CNBCRSSScraper(BaseScraper):
             return match_idx.group(1)
         return "UNKNOWN"
 
+    def _parse_feed(self, feed: Any, max_items: int = 25, forced_ticker: str | None = None) -> list[ScrapedRawDocument]:
+        documents: list[ScrapedRawDocument] = []
+        for entry in feed.entries[:max_items]:
+            title = getattr(entry, "title", "").strip()
+            link = getattr(entry, "link", "")
+            summary_html = getattr(entry, "summary", "")
+            summary = BeautifulSoup(summary_html, "html.parser").get_text().strip()
+
+            ticker = self._extract_ticker(f"{title} {summary}")
+            
+            # If forced_ticker is given, we only accept if it matches in title or summary
+            if forced_ticker:
+                search_text = f"{title} {summary}".lower()
+                if forced_ticker.lower() not in search_text and ticker != forced_ticker:
+                    continue
+                ticker = forced_ticker
+
+            published_parsed = getattr(entry, "published_parsed", None)
+            if published_parsed:
+                pub_date = datetime(*published_parsed[:6], tzinfo=timezone.utc)
+            else:
+                pub_date = datetime.now(timezone.utc)
+
+            doc = ScrapedRawDocument(
+                ticker=ticker,
+                title=title,
+                source_url=link,
+                publication_date=pub_date,
+                raw_text=f"{title}\n\n{summary}",
+                source_name=self.source_name,
+            )
+            documents.append(doc)
+        return documents
+
     async def scrape(self) -> list[ScrapedRawDocument]:
         documents: list[ScrapedRawDocument] = []
         try:
             feed = await self._fetch_rss()
-            for entry in feed.entries[:25]:
-                title = getattr(entry, "title", "").strip()
-                link = getattr(entry, "link", "")
-                summary_html = getattr(entry, "summary", "")
-                summary = BeautifulSoup(summary_html, "html.parser").get_text().strip()
-
-                ticker = self._extract_ticker(f"{title} {summary}")
-
-                published_parsed = getattr(entry, "published_parsed", None)
-                if published_parsed:
-                    pub_date = datetime(*published_parsed[:6], tzinfo=timezone.utc)
-                else:
-                    pub_date = datetime.now(timezone.utc)
-
-                doc = ScrapedRawDocument(
-                    ticker=ticker,
-                    title=title,
-                    source_url=link,
-                    publication_date=pub_date,
-                    raw_text=f"{title}\n\n{summary}",
-                    source_name=self.source_name,
-                )
-                documents.append(doc)
+            documents = self._parse_feed(feed, max_items=25)
         except Exception as e:
             logger.error("Failed to scrape CNBC Indonesia Market RSS", error=str(e))
         self.save_to_cache(documents)
+        return documents
+
+    async def scrape_by_ticker(self, ticker: str) -> list[ScrapedRawDocument]:
+        """On-demand targeted scrape by fetching general RSS and filtering in memory."""
+        documents: list[ScrapedRawDocument] = []
+        try:
+            feed = await self._fetch_rss()
+            # Fetch up to 50 items and filter them in memory
+            documents = self._parse_feed(feed, max_items=50, forced_ticker=ticker)
+        except Exception as e:
+            logger.error(f"Failed to scrape_by_ticker for {ticker} from CNBC", error=str(e))
+        
         return documents

@@ -155,23 +155,23 @@ class NotificationCommandService:
         if cmd_clean.lower() == "/summary":
             return await self._handle_summary_command(phone_number)
 
-        if cmd_clean.lower().startswith("/subscribe"):
-            parts = cmd_clean.split()
-            if len(parts) < 2:
-                resp = "⚠️ Format salah. Gunakan: `/subscribe <TICKER>` (contoh: `/subscribe BUMI`)."
-                await self.waha.send_text(phone_number, resp)
-                return resp
-            ticker = parts[1].upper().lstrip("$")
-            return await self._handle_subscribe_command(phone_number, ticker)
+        # if cmd_clean.lower().startswith("/subscribe"):
+        #     parts = cmd_clean.split()
+        #     if len(parts) < 2:
+        #         resp = "⚠️ Format salah. Gunakan: `/subscribe <TICKER>` (contoh: `/subscribe BUMI`)."
+        #         await self.waha.send_text(phone_number, resp)
+        #         return resp
+        #     ticker = parts[1].upper().lstrip("$")
+        #     return await self._handle_subscribe_command(phone_number, ticker)
 
-        if cmd_clean.lower().startswith("/unsubscribe"):
-            parts = cmd_clean.split()
-            if len(parts) < 2:
-                resp = "⚠️ Format salah. Gunakan: `/unsubscribe <TICKER>` (contoh: `/unsubscribe BBCA`)."
-                await self.waha.send_text(phone_number, resp)
-                return resp
-            ticker = parts[1].upper().lstrip("$")
-            return await self._handle_unsubscribe_command(phone_number, ticker)
+        # if cmd_clean.lower().startswith("/unsubscribe"):
+        #     parts = cmd_clean.split()
+        #     if len(parts) < 2:
+        #         resp = "⚠️ Format salah. Gunakan: `/unsubscribe <TICKER>` (contoh: `/unsubscribe BBCA`)."
+        #         await self.waha.send_text(phone_number, resp)
+        #         return resp
+        #     ticker = parts[1].upper().lstrip("$")
+        #     return await self._handle_unsubscribe_command(phone_number, ticker)
 
         # Ignore unrecognized non-command messages
         return ""
@@ -182,13 +182,47 @@ class NotificationCommandService:
         if cached_resp:
             await self.waha.send_text(phone_number, cached_resp)
             return cached_resp
+            
+        # 1. On-Demand Scraping (Google News, Kontan, CNBC)
+        from app.scrapers.google_news_rss_scraper import GoogleNewsRSSScraper
+        from app.scrapers.kontan_rss_scraper import KontanRSSScraper
+        from app.scrapers.cnbc_rss_scraper import CNBCRSSScraper
+        from app.services.agent import AgentExecutionService
+        
+        google_scraper = GoogleNewsRSSScraper()
+        kontan_scraper = KontanRSSScraper()
+        cnbc_scraper = CNBCRSSScraper()
+        
+        # Run them concurrently
+        results = await asyncio.gather(
+            google_scraper.scrape_by_ticker(ticker),
+            kontan_scraper.scrape_by_ticker(ticker),
+            cnbc_scraper.scrape_by_ticker(ticker),
+            return_exceptions=True
+        )
+        
+        scraped_docs = []
+        for res in results:
+            if isinstance(res, list):
+                scraped_docs.extend(res)
+        
+        # 2. Run Pipeline (Langkah A)
+        for doc in scraped_docs:
+            logger.info(f"Processing on-demand scraped doc for {ticker}: {doc.title}")
+            try:
+                # We await it immediately so it gets saved to DB
+                await AgentExecutionService.process_document(doc)
+                logger.info(f"✅ Successfully analyzed and saved document for {ticker} to DB")
+            except Exception as e:
+                logger.error(f"Failed to process doc for {ticker}", error=str(e))
 
+        # 3. Retrieve from DB
         async with async_session_factory() as session:
             event_repo = EventRepository(session)
             events = await event_repo.get_latest_by_ticker(ticker, limit=3)
 
         if not events:
-            resp = f"ℹ️ Belum ada aksi korporasi strategis atau Konglo Move yang tercatat untuk *${ticker}*."
+            resp = f"ℹ️ Belum ada aksi korporasi strategis atau berita penting yang tercatat untuk *${ticker}*."
             await self.waha.send_text(phone_number, resp)
             return resp
 

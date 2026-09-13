@@ -41,7 +41,12 @@ async def waha_webhook_handler(
     if msg_payload.fromMe:
         return APIResponse(success=True, message="Ignored message sent by bot itself")
 
-    phone_number = msg_payload.from_.split("@")[0]
+    raw_from = msg_payload.from_
+    if "@g.us" in raw_from:
+        phone_number = raw_from
+    else:
+        phone_number = raw_from.split("@")[0]
+
     response_text = await notification_service.process_incoming_command(
         phone_number=phone_number,
         text=msg_payload.body,
