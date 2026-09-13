@@ -1,10 +1,11 @@
+import asyncio
 from contextlib import asynccontextmanager
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from app.config import get_settings
-from app.routers import health_router, monitor_router, webhook_router, chat_router
+from app.routers import health_router, monitor_router, webhook_router, chat_router, call_router
 from app.utils.db_session import engine
 from app.utils.logger import get_logger, setup_logging
 from app.scheduler import scheduler
@@ -25,6 +26,11 @@ async def lifespan(app: FastAPI):
         environment=settings.ENVIRONMENT,
         debug=settings.DEBUG,
     )
+    
+    # Start the dedicated queue worker
+    from app.scheduler import _document_queue_worker
+    app.state.queue_worker_task = asyncio.create_task(_document_queue_worker())
+    
     scheduler.start()
     logger.info("Background scheduler started (cron */5)")
     
@@ -32,6 +38,8 @@ async def lifespan(app: FastAPI):
     
     logger.info("Shutting down IDX-Intel AI Service... Closing database pool")
     scheduler.shutdown()
+    if hasattr(app.state, "queue_worker_task"):
+        app.state.queue_worker_task.cancel()
     logger.info("Background scheduler stopped")
     await engine.dispose()
     logger.info("Database pool closed gracefully")
@@ -62,6 +70,7 @@ def create_app() -> FastAPI:
     application.include_router(webhook_router)
     application.include_router(monitor_router)
     application.include_router(chat_router)
+    application.include_router(call_router)
 
     @application.get("/", summary="IDX-Intel AI Root Welcome Endpoint")
     async def root_index():

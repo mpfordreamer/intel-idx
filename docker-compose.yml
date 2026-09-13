@@ -22,7 +22,7 @@ services:
     container_name: idx_intel_redis
     restart: always
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis_data:/data
     healthcheck:

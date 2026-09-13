@@ -63,3 +63,25 @@ class EventRepository(BaseRepository[CorporateEvent]):
         )
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
+
+    async def get_recent_by_category(self, category: str, limit: int = 10) -> list[CorporateEvent]:
+        """Fetch recent events by specific category (e.g. KONGLO_MOVE)."""
+        stmt = (
+            select(CorporateEvent)
+            .where(CorporateEvent.event_type == category)
+            .order_by(CorporateEvent.publication_date.desc())
+            .limit(limit)
+        )
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def get_recent_by_tickers(self, tickers: list[str], limit: int = 10) -> list[CorporateEvent]:
+        """Fetch recent events for a list of specific tickers (e.g. famous stocks)."""
+        stmt = (
+            select(CorporateEvent)
+            .where(CorporateEvent.ticker.in_(tickers))
+            .order_by(CorporateEvent.publication_date.desc())
+            .limit(limit)
+        )
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())

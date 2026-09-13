@@ -20,13 +20,29 @@ scrapers = [
     KontanRSSScraper()
 ]
 
-async def _process_docs_background(docs):
-    """Processes a list of documents sequentially in the background to not block the scheduler."""
-    for doc in docs:
+# Global background queue for scraped documents
+DOCUMENT_QUEUE: asyncio.Queue = asyncio.Queue()
+
+async def _document_queue_worker():
+    """
+    Consumes the DOCUMENT_QUEUE sequentially.
+    Ensures only 1 document is processed at a time across the entire app
+    to prevent pile-up and timeouts on the Ollama inference server.
+    """
+    logger.info("Background document processing worker started.")
+    while True:
         try:
+            doc = await DOCUMENT_QUEUE.get()
+            logger.info(f"Worker dequeued document: {doc.ticker}")
             await AgentExecutionService.process_document(doc)
+        except asyncio.CancelledError:
+            logger.info("Background worker cancelled.")
+            break
         except Exception as e:
-            logger.error(f"AI Pipeline failed for {doc.ticker}", error=str(e))
+            logger.error("AI Pipeline failed in worker", error=str(e))
+        finally:
+            DOCUMENT_QUEUE.task_done()
+
 
 async def run_all_scrapers():
     """
@@ -60,11 +76,17 @@ async def run_all_scrapers():
                     logger.warning(f"Failed to parse date for {doc.ticker}: {e}")
 
     if docs_to_process:
-        logger.info(f"Dispatching {len(docs_to_process)} documents to background AI processing task.")
-        asyncio.create_task(_process_docs_background(docs_to_process))
+        logger.info(f"Enqueueing {len(docs_to_process)} documents for background AI processing.")
+        for doc in docs_to_process:
+            DOCUMENT_QUEUE.put_nowait(doc)
         
     logger.info(f"Finished scraping cycle. Total documents fetched: {total_docs}")
 
 # Global scheduler instance
 scheduler = AsyncIOScheduler()
+
+async def log_heartbeat():
+    logger.info(f"System heartbeat: Idle and waiting for next scrape... Queue size: {DOCUMENT_QUEUE.qsize()}")
+
+scheduler.add_job(log_heartbeat, 'interval', minutes=1)
 scheduler.add_job(run_all_scrapers, 'cron', minute='*/5')

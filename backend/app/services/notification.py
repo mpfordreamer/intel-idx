@@ -1,6 +1,7 @@
 import asyncio
 import json
 import time
+import re
 from typing import Any
 import redis.asyncio as aioredis
 from app.config import get_settings
@@ -9,6 +10,7 @@ from app.repositories.user_repository import UserRepository
 from app.services.waha import WAHAClient
 from app.utils.db_session import async_session_factory
 from app.utils.logger import get_logger
+from app.agents.chat import ChatAgentService
 
 logger = get_logger("services.notification")
 settings = get_settings()
@@ -132,6 +134,15 @@ class NotificationCommandService:
             await self.waha.send_text(phone_number, warn_msg)
             return warn_msg
 
+        if cmd_clean.lower() == "/famous":
+            return await self._handle_famous_command(phone_number)
+
+        # Match direct ticker calls like /bbca, /bumi, /bren, /ammn
+        ticker_match = re.match(r"^/([a-zA-Z]{4})$", cmd_clean)
+        if ticker_match:
+            ticker = ticker_match.group(1).upper()
+            return await self._handle_cek_command(phone_number, ticker)
+
         if cmd_clean.lower().startswith("/cek"):
             parts = cmd_clean.split()
             if len(parts) < 2:
@@ -181,9 +192,48 @@ class NotificationCommandService:
             await self.waha.send_text(phone_number, resp)
             return resp
 
-        # Use the latest formatted message or compile summary
-        latest = events[0]
-        resp = latest.wa_formatted_message or f"🚨 *[IDX-INTEL ALERT]*\nEmiten: *${ticker}*\nEvent: {latest.title}"
+        # Convert ORM objects to dict for the LLM
+        events_data = []
+        for ev in events:
+            events_data.append({
+                "ticker": ev.ticker,
+                "title": ev.title,
+                "event_type": ev.event_type,
+                "publication_date": ev.publication_date.isoformat() if ev.publication_date else None,
+                "recommendation_class": ev.recommendation_class,
+                "impact_analysis": ev.impact_analysis
+            })
+            
+        resp = await ChatAgentService.generate_ticker_summary(ticker, events_data)
+        
+        await self.cache.set(cache_key, resp)
+        await self.waha.send_text(phone_number, resp)
+        return resp
+
+    async def _handle_famous_command(self, phone_number: str) -> str:
+        cache_key = "famous:latest"
+        cached_resp = await self.cache.get(cache_key)
+        if cached_resp:
+            await self.waha.send_text(phone_number, cached_resp)
+            return cached_resp
+
+        famous_tickers = ["BBCA", "BMRI", "BREN", "CUAN", "AMMN", "BUMI", "BRPT", "PTRO", "TPIA"]
+        async with async_session_factory() as session:
+            event_repo = EventRepository(session)
+            events = await event_repo.get_recent_by_tickers(famous_tickers, limit=10)
+
+        events_data = []
+        for ev in events:
+            events_data.append({
+                "ticker": ev.ticker,
+                "title": ev.title,
+                "event_type": ev.event_type,
+                "publication_date": ev.publication_date.isoformat() if ev.publication_date else None,
+                "impact_analysis": ev.impact_analysis
+            })
+            
+        resp = await ChatAgentService.generate_category_summary("Famous Stocks & Konglo", events_data)
+
         await self.cache.set(cache_key, resp)
         await self.waha.send_text(phone_number, resp)
         return resp
@@ -199,16 +249,17 @@ class NotificationCommandService:
             event_repo = EventRepository(session)
             events = await event_repo.get_recent_events(limit=5)
 
-        if not events:
-            resp = "ℹ️ Belum ada ringkasan aksi korporasi strategis terbaru saat ini."
-            await self.waha.send_text(phone_number, resp)
-            return resp
-
-        lines = ["📈 *RINGKASAN AKSI KORPORASI STRATEGIS & KONGLO MOVE* 📈", "------------------------------------------------"]
-        for idx, ev in enumerate(events, 1):
-            lines.append(f"{idx}. *${ev.ticker}* [{ev.event_type}]: {ev.title} _({ev.recommendation_class or 'HOLD/WATCH'})_")
-        lines.append("------------------------------------------------\nKetik `/cek <TICKER>` untuk detail lengkap.")
-        resp = "\n".join(lines)
+        events_data = []
+        for ev in events:
+            events_data.append({
+                "ticker": ev.ticker,
+                "title": ev.title,
+                "event_type": ev.event_type,
+                "publication_date": ev.publication_date.isoformat() if ev.publication_date else None,
+                "impact_analysis": ev.impact_analysis
+            })
+            
+        resp = await ChatAgentService.generate_category_summary("Ringkasan Umum", events_data)
 
         await self.cache.set(cache_key, resp)
         await self.waha.send_text(phone_number, resp)
