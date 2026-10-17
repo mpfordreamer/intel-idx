@@ -9,6 +9,8 @@ from app.scrapers import (
     IDXAnnouncementScraper,
     IPOTNewsScraper,
     KontanRSSScraper,
+    TradingViewNewsScraper,
+    YahooFinanceScraper,
 )
 from app.utils.db_session import async_session_factory
 from app.utils.logger import get_logger
@@ -30,6 +32,8 @@ class ScraperCoordinatorService:
             KontanRSSScraper(),
             IDNFinancialsScraper(),
             IPOTNewsScraper(),
+            TradingViewNewsScraper(),
+            YahooFinanceScraper(),
         ]
 
     async def collect_new_documents(self) -> list[ScrapedRawDocument]:

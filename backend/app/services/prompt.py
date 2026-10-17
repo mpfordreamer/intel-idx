@@ -32,6 +32,7 @@ Your task is to classify an incoming news article, official announcement, or rum
 
 5. "IRRELEVANT":
    - Routine corporate action news: Ordinary Rights Issue without conglomerate standby buyers, ordinary Dividend Distribution, routine Financial Reports, ordinary UMA / Suspension unrelated to accumulation, or general news not involving Backdoor Listing / Smart Money Accumulation.
+   - Bank loan collateral, share pledge (agunan saham / gadai saham), or credit risk warnings without direct equity purchase or strategic accumulation.
 
 STRICT RULE:
 If the news DOES NOT contain the characteristics of a Backdoor Listing or Conglomerate / Smart Money movement as described above, you MUST classify it as "IRRELEVANT" to avoid flooding the WhatsApp channel.
@@ -47,7 +48,7 @@ EXTRACTOR_SYSTEM_PROMPT = """
 You are a Quantitative Financial Fact Extractor for Indonesian Stock Exchange (IDX) corporate actions.
 Extract structured quantitative parameters from the provided text into the ExtractedEventData schema:
 - action_type: e.g., "Crossing Pasar Negosiasi", "Private Placement", "Reverse Takeover", "Right Issue Hype", "Akuisisi PSP"
-- investor_or_group: Identify the specific Konglomerat, Smart Money, or Investor Group involved (e.g., "Mach Energy (Grup Salim)", "Grup Barito / Prajogo Pangestu", "Grup Bakrie", "Hermanto Tanoko")
+- investor_or_group: Identify the specific Konglomerat, Smart Money, or Investor Group actively buying/participating. (CRITICAL: DO NOT extract an entity if they are merely mentioned as a historical comparison, cautionary analogy, or risk reference like 'kasus 2008' or 'risiko saham membayangi').
 - execution_price_idr: Execution price per share in IDR (float)
 - transaction_value_idr: Total transaction value in IDR (float)
 - ownership_percentage: Percentage of ownership acquired or held (float)
@@ -73,31 +74,60 @@ CRITICAL INSTRUCTION: Your analysis MUST be highly specific and dynamic based on
 
 
 # =====================================================================
-# 4. RECOMMENDATION ENGINE SYSTEM PROMPT (Top 200 Konglomerat Rule)
+# 4. RECOMMENDATION ENGINE SYSTEM PROMPT (Multi-Horizon Context-Aware)
 # =====================================================================
 RECOMMENDATION_SYSTEM_PROMPT = """
-You are an Investment Strategy Engine for IDX stocks.
-Determine the final recommendation class STRICTLY based on these rules:
+You are a Principal Investment Strategist and Quantitative Research Director for Indonesian Capital Markets (IDX).
+Your task is to analyze the full context of an emiten corporate action—considering past historical events, market dynamics, and underlying fundamentals—to formulate a durable, multi-horizon investment thesis rather than a momentary knee-jerk snapshot.
 
+Primary Stance Options (MUST PRESERVE EXACT UNDERSCORE NOTATION):
 1. "STRONG_BUY_AKUMULASI":
-   - MANDATORY when the corporate action involves Top 200 Konglomerat Indonesia or famous business groups (e.g., Prajogo Pangestu / Grup Barito, Salim Group, Djarum, Bakrie, Agung Sedayu, Panin, Chandra Asri, Boy Thohir, Sukanto Tanoto, Franky Widjaja, Tomy Winata, Hermanto Tanoko, Dato Sri Tahir, Sinarmas, Happy Hapsoro etc.).
+   - MANDATORY when the corporate action involves Top 200 Indonesian Conglomerates or elite business groups (e.g. Prajogo Pangestu / Barito, Salim Group, Djarum / Hartono, Bakrie, Agung Sedayu / Aguan, Panin, Chandra Asri, Boy Thohir, Sukanto Tanoto, Franky Widjaja, Tomy Winata, Hermanto Tanoko, Dato Sri Tahir, Sinarmas, Happy Hapsoro, Mach Energy) as a CONFIRMED ACTIVE BUYER, ACQUIRER, or STRATEGIC INVESTOR with positive expansion sentiment.
    - MANDATORY for Reverse Takeovers / Backdoor Listing backed by tier-1 Smart Money.
+   - TRANSACTION VERIFICATION RULE: Before recommending STRONG_BUY_AKUMULASI, you MUST verify that the text describes an ACTUAL, POSITIVE EQUITY TRANSACTION (e.g. negotiated market crossing, M&A/acquisition >5%, rights issue standby buyer, capital injection). If the article is merely USUAL NEWS, media commentary, or mentions a conglomerate without an active positive buying transaction, you MUST output "HOLD_WATCH" or "WAIT_AND_SEE", NEVER "STRONG_BUY_AKUMULASI".
+   - CRITICAL EXCEPTION: STRICTLY FORBIDDEN to recommend STRONG_BUY_AKUMULASI if the event is bank loan collateral, share pledge (agunan/gadai saham), margin call, debt default, wanprestasi, or if the conglomerate is merely cited as a historical comparison/risk analogy (e.g., 'risiko krisis 2008 membayangi'). In such cases, output HOLD_WATCH or AVOID.
+   - REGULATORY SCRUTINY & SANCTIONS OVERRIDE: If the news reports regulatory investigations, inspections, or inquiry (pemeriksaan OJK/BEI, periksa jatah IPO, penyelidikan bursa, panggilan klarifikasi), sanctions (sanksi), fines (denda), stock manipulation (manipulasi harga saham), fraud investigation, or criminal charges (tindak pidana) — you MUST output "AVOID" regardless of conglomerate presence. Think first: is the conglomerate an ACTIVE BUYER or a SUBJECT OF REGULATORY SCRUTINY / SANCTIONS? If inspected/investigated/sanctioned/fined, output "AVOID".
 
 2. "BUY":
-   - Positive corporate action with strategic expansion or debt reduction without tier-1 Konglomerat participation.
+   - High-conviction organic growth, clear accretive corporate action, significant net profit turnaround, or major contract win without tier-1 konglo.
 
-3. "HOLD_WATCH":
-   - Speculative corporate action, early-stage rumor, or neutral valuation impact.
+3. "ACCUMULATE_ON_WEAKNESS":
+   - Strategic corporate action with attractive long-term valuation, but short-term price pressure or supply absorption suggests buying on pullbacks.
 
-4. "AVOID":
-   - Dilutive corporate action without standby buyer or negative restructuring.
+4. "MOMENTUM_BUY":
+   - High volume momentum, market-moving breakthrough, or unexpected earnings surprise with immediate upside liquidity.
 
-Output ONLY the exact recommendation class string: STRONG_BUY_AKUMULASI, BUY, HOLD_WATCH, or AVOID.
+5. "STRATEGIC_HOLD" / "HOLD_WATCH":
+   - Neutral corporate action, pending EGM / RUPS approvals, awaiting official prospectus terms, healthy share pledge without default distress, or usual news commentary without direct buying.
+
+6. "WAIT_AND_SEE":
+   - High uncertainty, regulatory review underway, or conflicting market rumors.
+
+7. "AVOID" / "AVOID_HIGH_RISK":
+   - Regulatory inspection/investigation (pemeriksaan OJK/BEI), dilutive corporate action without standby buyer, debt default, wanprestasi, foreclosure risk, or hostile divestment by controllers.
+
+Output Format:
+You MUST respond with a valid JSON object matching the following structure:
+{
+  "primary_stance": "STRONG_BUY_AKUMULASI",
+  "conviction_level": "HIGH",
+  "dynamic_narrative": "A concise, sharp 2-3 sentence AI narrative summarizing the strategic corporate action, participants, and context without hardcoded bullet points.",
+  "multi_horizon": {
+    "short_term": "1-14 hari: Sentimen pasar, volume transaksi, dan antisipasi teknikal",
+    "medium_term": "1-3 bulan: Eksekusi aksi korporasi, jadwal RUPS, prospektus resmi",
+    "long_term": "6-12+ bulan: Valuasi fundamental, sinergi grup bisnis, dan pertumbuhan laba"
+  },
+  "key_catalysts": ["Katalis 1", "Katalis 2"],
+  "invalidation_triggers": [
+    "Kondisi riil atau batas toleransi risiko di mana analisis ini GUGUR/BATAL (misal: wanprestasi, pembatalan akuisisi, breakdown support)"
+  ],
+  "action_plan": "Langkah taktis yang disarankan bagi investor (misal: akumulasi bertahap di area support)"
+}
 """.strip()
 
 
 # =====================================================================
-# 5. WHATSAPP MARKDOWN ALERT FORMATTER
+# 5. WHATSAPP MARKDOWN ALERT FORMATTER (100% Dynamic AI Generated)
 # =====================================================================
 def format_wa_alert_message(
     ticker: str,
@@ -108,16 +138,21 @@ def format_wa_alert_message(
     recommendation_class: str | None,
     source_url: str | None,
     raw_text: str | None = None,
+    multi_horizon: dict[str, str] | None = None,
+    invalidation_triggers: list[str] | None = None,
+    action_plan: str | None = None,
+    dynamic_narrative: str | None = None,
+    is_us: bool = False,
 ) -> str:
     """
-    Formats extracted intelligence into the crisp, visually stunning WhatsApp markdown template
-    required by IDX-Intel AI user specifications.
+    Formats extracted intelligence into the crisp, visually stunning WhatsApp markdown template.
+    Enforces 100% dynamic AI-generated narrative (no static bullet points) and preserves underscore notation.
     """
     if event_type == "IRRELEVANT":
         summary = ""
         if raw_text:
             summary = raw_text[:300].strip() + ("..." if len(raw_text) > 300 else "")
-            
+
         source_display = f"Sumber: {source_url}" if source_url else ""
         return f"""[BERITA HARIAN]
 Emiten: {ticker.upper()}
@@ -127,7 +162,7 @@ Judul: {title}
 
 {source_display}""".strip()
 
-    # Category and event parsing
+    # Category label mapping
     category_label = "Konglo Move / Akumulasi Strategis"
     if event_type == "BACKDOOR_LISTING":
         category_label = "Backdoor Listing / Injeksi Aset"
@@ -136,51 +171,27 @@ Judul: {title}
     elif event_type == "BIG_CONTRACT":
         category_label = "Big Contract / Proyek Jumbo"
 
-    action_type = "Corporate Action"
-    investor_group = ""
-    
-    details = []
+    # Dynamic AI background narrative (NO static bullet points!)
+    narrative_display = dynamic_narrative
+    if not narrative_display:
+        # Graceful fallback synthesis if LLM returned direct recommendation without narrative
+        action_type = extracted_data.get("action_type") if extracted_data else "Aksi Korporasi"
+        investor_group = f" yang melibatkan {extracted_data.get('investor_or_group')}" if extracted_data and extracted_data.get("investor_or_group") else ""
+        narrative_display = (
+            f"Emiten ${ticker.upper()} terdeteksi mengalami manuver strategis {action_type}{investor_group}. "
+            f"Aktivitas ini diidentifikasi sebagai pergerakan {category_label} yang berpotensi mempengaruhi likuiditas pasar dan valuasi emiten."
+        )
 
-    if extracted_data:
-        action_type = extracted_data.get("action_type") or "Corporate Action"
-        investor_group = extracted_data.get("investor_or_group")
-        if investor_group:
-            investor_group = f" yang melibatkan {investor_group}"
-        else:
-            investor_group = ""
-            
-        price_val = extracted_data.get("execution_price_idr")
-        if price_val:
-            details.append(f"dieksekusi di harga Rp {price_val:,.0f} per saham".replace(",", "."))
-            
-        val_idr = extracted_data.get("transaction_value_idr")
-        if val_idr:
-            if val_idr >= 1_000_000_000_000:
-                tx_val_format = f"± Rp {val_idr / 1_000_000_000_000:.2f} Triliun".replace(".", ",")
-            elif val_idr >= 1_000_000_000:
-                tx_val_format = f"± Rp {val_idr / 1_000_000_000:.2f} Miliar".replace(".", ",")
-            else:
-                tx_val_format = f"Rp {val_idr:,.0f}".replace(",", ".")
-            details.append(f"dengan total nilai mencapai {tx_val_format}")
-            
-        owner_val = extracted_data.get("ownership_percentage")
-        if owner_val:
-            details.append(f"yang merepresentasikan kepemilikan saham sebesar {owner_val:.1f}%")
+    # Recommendation processing — PRESERVE UNDERSCORES!
+    rec_label = (recommendation_class or "HOLD_WATCH").strip()
 
-    if details:
-        corporate_detail = ", ".join(details) + "."
-    else:
-        corporate_detail = "tanpa ada rincian transaksi eksplisit yang disebutkan."
-
-    # Recommendation processing
-    rec_label = recommendation_class or "HOLD WATCH"
-    rec_label = rec_label.replace("_", " ")  # Remove underscores!
-    
-    if "STRONG BUY" in rec_label or "AKUMULASI" in rec_label:
+    if "STRONG_BUY" in rec_label or "AKUMULASI" in rec_label:
         rec_display = f"💡 {rec_label} — Didukung oleh pergerakan tier-1 konglomerat / prospek ekspansi kuat."
-    elif "BUY" in rec_label:
+    elif "ACCUMULATE" in rec_label:
+        rec_display = f"💡 {rec_label} — Akumulasi bertahap memanfaatkan momentum pelemahan harga."
+    elif "MOMENTUM_BUY" in rec_label or "BUY" in rec_label:
         rec_display = f"📈 {rec_label} — Transaksi positif dengan ekspansi fundamental yang solid."
-    elif "HOLD" in rec_label:
+    elif "HOLD" in rec_label or "WAIT" in rec_label:
         rec_display = f"🔎 {rec_label} — Pantau realisasi likuiditas pasar terlebih dahulu."
     else:
         rec_display = f"⚠️ {rec_label} — Evaluasi kembali risiko terkait."
@@ -188,17 +199,47 @@ Judul: {title}
     analysis_display = impact_analysis or "Analisis dampak sedang diproses."
     source_display = f"Sumber Berita: {source_url}" if source_url else ""
 
-    message = f"""🚨 *[IDX-INTEL ALERT] {category_label.upper()}* 🚨
+    # Multi-Horizon Section
+    horizon_section = ""
+    if multi_horizon:
+        st = multi_horizon.get("short_term", "Pantau volatilitas sesaat dan likuiditas pasar.")
+        mt = multi_horizon.get("medium_term", "Perhatikan jadwal pelaksanaan aksi korporasi dan keterbukaan informasi.")
+        lt = multi_horizon.get("long_term", "Pertumbuhan kinerja fundamental dan sinergi jangka panjang.")
+        horizon_section = f"""
+
+*Horizon Investasi:*
+• Jangka Pendek (1-14 hr): {st}
+• Jangka Menengah (1-3 bln): {mt}
+• Jangka Panjang (6-12+ bln): {lt}"""
+
+    # Invalidation Triggers Section
+    inval_section = ""
+    if invalidation_triggers and len(invalidation_triggers) > 0:
+        triggers_str = "\n".join(f"⚠️ {t}" for t in invalidation_triggers)
+        inval_section = f"""
+
+*Batas Pembatalan Analisis (Invalidation Trigger):*
+{triggers_str}"""
+
+    # Action Plan Section
+    action_section = ""
+    if action_plan:
+        action_section = f"""
+
+*Panduan Aksi:*
+💡 {action_plan}"""
+
+    brand_prefix = "US-INTEL ALERT" if is_us else "IDX-INTEL ALERT"
+    message = f"""🚨 *[{brand_prefix}] {category_label.upper()}* 🚨
 Emiten: ${ticker.upper()}
 
-Telah terdeteksi aktivitas {action_type}{investor_group}, {corporate_detail}
-Kategori pergerakan ini diidentifikasi sebagai indikasi {category_label}.
+{narrative_display}
 
 *Analisis Dampak & Strategi:*
 {analysis_display}
 
-*Rekomendasi Keputusan:*
-*{rec_display}*
+*🎯 Rekomendasi : [Class: {rec_label}]*
+{rec_display}{horizon_section}{inval_section}{action_section}
 
 {source_display}""".strip()
 

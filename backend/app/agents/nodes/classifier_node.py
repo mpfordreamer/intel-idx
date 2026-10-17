@@ -18,7 +18,25 @@ def _fallback_keyword_classify(ticker: str, title: str, text: str) -> EventClass
     """
     content_lower = f"{title} {text}".lower()
 
-    # 1. Backdoor Listing keywords
+    # 1. Loan collateral / share pledge exclusion (bukan akumulasi modal)
+    pledge_kws = ["agunan saham", "gadai saham", "jaminan kredit", "risiko saham bakrie", "risiko membayangi"]
+    if any(kw in content_lower for kw in pledge_kws) and not any(kw in content_lower for kw in ["crossing pasar negosiasi", "akuisisi", "injeksi aset", "tender offer"]):
+        return EventClassificationResult(
+            category="IRRELEVANT",
+            confidence_score=0.95,
+            reasoning="Berita terkait agunan/gadai saham atau risiko kredit perbankan tanpa aksi akumulasi modal.",
+        )
+
+    # 2. Regulatory scrutiny / inspection exclusion (pemeriksaan/penyelidikan bukan akumulasi konglomerat)
+    reg_kws = ["periksa", "pemeriksaan", "penyelidikan", "klarifikasi bursa", "dugaan manipulasi", "sanksi ojk", "jatah ipo", "kasus manipulasi"]
+    if any(kw in content_lower for kw in reg_kws) and not any(kw in content_lower for kw in ["crossing pasar negosiasi", "akuisisi", "injeksi aset", "tender offer"]):
+        return EventClassificationResult(
+            category="IRRELEVANT",
+            confidence_score=0.95,
+            reasoning="Berita terkait pemeriksaan atau penyelidikan regulator tanpa aksi transaksi modal nyata.",
+        )
+
+    # 3. Backdoor Listing keywords
     backdoor_kws = ["backdoor listing", "backdoor", "injeksi aset", "reverse takeover", "perusahaan cangkang", "dormant"]
     if any(kw in content_lower for kw in backdoor_kws):
         return EventClassificationResult(
@@ -27,7 +45,7 @@ def _fallback_keyword_classify(ticker: str, title: str, text: str) -> EventClass
             reasoning="Keyword-based detection of Backdoor Listing / Asset Injection.",
         )
 
-    # 2. Konglo Move keywords
+    # 3. Konglo Move keywords
     konglo_kws = [
         "salim",
         "prajogo pangestu",
@@ -57,16 +75,7 @@ def _fallback_keyword_classify(ticker: str, title: str, text: str) -> EventClass
             reasoning="Keyword-based detection of Top 200 Konglomerat / Smart Money accumulation.",
         )
 
-    # 3. Earnings / Financial Report keywords
-    earnings_kws = ["laba bersih", "keuntungan", "laporan keuangan", "kinerja keuangan", "laba berjalan", "rugi bersih"]
-    if any(kw in content_lower for kw in earnings_kws):
-        return EventClassificationResult(
-            category="SURPRISE_FUNDAMENTAL",
-            confidence_score=0.90,
-            reasoning="Keyword-based detection of Financial / Earnings report.",
-        )
-
-    # 4. Otherwise IRRELEVANT (Aturan Ketat)
+    # 3. Otherwise IRRELEVANT (Aturan Ketat: bukan Backdoor Listing atau Konglo Move)
     return EventClassificationResult(
         category="IRRELEVANT",
         confidence_score=0.95,

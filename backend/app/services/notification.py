@@ -9,6 +9,7 @@ from app.repositories.event_repository import EventRepository
 from app.repositories.user_repository import UserRepository
 from app.services.waha import WAHAClient
 from app.utils.db_session import async_session_factory
+from app.utils.errors import is_token_or_quota_error
 from app.utils.logger import get_logger
 from app.agents.chat import ChatAgentService
 
@@ -130,9 +131,11 @@ class NotificationCommandService:
 
         # Check Rate Limiting / Throttling
         if await self.rate_limiter.is_rate_limited(phone_number):
-            warn_msg = "⚠️ *Rate Limit Exceeded*: Anda telah mengirim terlalu banyak perintah. Silakan tunggu 1 menit."
-            await self.waha.send_text(phone_number, warn_msg)
-            return warn_msg
+            logger.warning(
+                "🛑 [RATE LIMIT / TOKEN THROTTLED] User mencapai limit perintah. Pesan WhatsApp ditiadakan.",
+                phone_number=phone_number,
+            )
+            return ""
 
         if cmd_clean.lower() == "/famous":
             return await self._handle_famous_command(phone_number)
@@ -239,6 +242,12 @@ class NotificationCommandService:
             })
             
         resp = await ChatAgentService.generate_ticker_summary(ticker, events_data)
+        if not resp or is_token_or_quota_error(resp):
+            logger.warning(
+                "🛑 [TOKEN HABIS] Summary ticker kosong atau kuota habis. Pesan WhatsApp ditiadakan.",
+                ticker=ticker,
+            )
+            return ""
         
         await self.cache.set(cache_key, resp)
         await self.waha.send_text(phone_number, resp)
@@ -267,6 +276,11 @@ class NotificationCommandService:
             })
             
         resp = await ChatAgentService.generate_category_summary("Famous Stocks & Konglo", events_data)
+        if not resp or is_token_or_quota_error(resp):
+            logger.warning(
+                "🛑 [TOKEN HABIS] Summary Famous Stocks kosong atau kuota habis. Pesan WhatsApp ditiadakan.",
+            )
+            return ""
 
         await self.cache.set(cache_key, resp)
         await self.waha.send_text(phone_number, resp)
@@ -294,6 +308,11 @@ class NotificationCommandService:
             })
             
         resp = await ChatAgentService.generate_category_summary("Ringkasan Umum", events_data)
+        if not resp or is_token_or_quota_error(resp):
+            logger.warning(
+                "🛑 [TOKEN HABIS] Summary umum kosong atau kuota habis. Pesan WhatsApp ditiadakan.",
+            )
+            return ""
 
         await self.cache.set(cache_key, resp)
         await self.waha.send_text(phone_number, resp)

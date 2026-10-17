@@ -1,454 +1,356 @@
 # Product Requirement Document (PRD)
-## AI-Driven IDX Corporate Action & Market Intelligence System (IDX-Intel AI)
+## AI-Driven IDX Corporate Action & Multi-Market Sector Intelligence System (IDX-Intel AI)
 
 ---
 
 | Parameter | Spesifikasi |
 | :--- | :--- |
-| **Nama Proyek** | IDX-Intel AI (Corporate Action & IHSG Market Monitor) |
-| **Versi Dokumen** | v2.0.0 |
+| **Nama Proyek** | IDX-Intel AI (Corporate Action, Sector & Global Commodity Intelligence) |
+| **Versi Dokumen** | v2.2.0 (Enterprise Multi-Horizon, Multi-Market & Dedicated WA Groups Edition) |
 | **Bahasa Pemrograman** | Python 3.12+ |
 | **Core Architecture** | Router-Service-Repository Pattern (FastAPI APIRouter / Controller), SOLID Principles |
-| **Core Stack** | FastAPI, LangGraph, WAHA (WhatsApp HTTP API), SQLite, Redis |
+| **Core Stack** | FastAPI, LangGraph, WAHA (WhatsApp HTTP API), PostgreSQL, Redis |
 | **Database Transaction** | Full ACID-Compliant Persistence (SQLAlchemy Async Engine + asyncpg) |
 
 ---
 
 ## 1. Executive Summary & Latar Belakang
 
-Di Bursa Efek Indonesia (BEI / IHSG), informasi seputar **Aksi Korporasi (Corporate Actions)** dan **Pergerakan Konglomerat / Pemain Kunci (Konglo Moves)** merupakan katalis utama (*market catalyst*) yang memicu pergeseran valuasi, akumulasi/distribusi saham, serta volatilitas harga. 
+Di Bursa Efek Indonesia (BEI / IHSG) serta pasar finansial global, pergerakan harga saham dan arus modal digerakkan oleh dua katalis utama:
+1. **Aksi Korporasi & Konglo Moves di BEI:** Stock Split, Reverse Takeover, Injeksi Aset, Rights Issue, dan transaksi crossing oleh konglomerat utama (*Smart Money*).
+2. **Sentimen Sektor Makro & Komoditas Dunia:** Fluktuasi harga komoditas strategis (Emas, Perak, Tembaga, Timah, Aluminium, Nikel, Minyak Mentah, Batu Bara, Litium, Uranium, CPO) serta rotasi modal di bursa global (S&P 500, US Tech & Semis, US Financials).
 
-Informasi penting ini sering kali tersebar di berbagai kanal:
-- Pengumuman Keterbukaan Informasi BEI (IDX Announcements dalam format PDF/Teks)
-- Berita Pasar Modal & RSS Feeds (Bisnis, CNBC Indonesia, Kontan, Bloomberg Technoz)
-- Laporan Kepemilikan Saham > 5% & Kustodian Sentral Efek Indonesia (KSEI)
+Sering kali investor ritel maupun institusi:
+- **Terjebak kesimpulan sesaat (*momentary conclusion*):** Rekomendasi yang hanya melihat satu berita tanpa melihat rentetan aksi masa lalu emiten (misal: emiten sedang dililit utang gadai saham, namun disimpulkan *Strong Buy* hanya karena ada rumor konglo).
+- **Template hardcoded yang kaku:** Notifikasi yang menyajikan bullet point statis 'Detail Aksi Korporasi' yang sering kali tidak relevan atau kosong jika rincian nominal tidak dipublikasikan lengkap.
+- **Ketiadaan panduan horizon waktu:** Tidak membedakan antara potensi volatilitas jangka pendek (1–14 hari) dengan nilai fundamental jangka panjang (6–12 bulan).
+- **Pencampuran audiens komunitas:** Pesan bursa Indonesia dan bursa Wall Street/S&P 500 tercampur dalam satu grup WhatsApp yang membingungkan anggota komunitas.
 
-Investor, analis, dan *trader* sering kali kehilangan momentum (*alpha*) karena keterlambatan dalam membaca, memverifikasi, dan menyimpulkan dampak dari pengumuman yang panjang dan kompleks.
-
-**IDX-Intel AI** dirancang sebagai platform pemantauan (*monitoring system*) dan analisis otomatis berbasis **AI Orchestration (LangGraph)** dan **FastAPI**. Sistem ini secara kontinu mengagregasi data dari bursa dan media, mengekstrak fakta penting secara rasional dan terstruktur menggunakan Large Language Models (LLM), serta mendistribusikan *alert* ringkas secara *real-time* langsung ke WhatsApp pengguna melalui **WAHA (WhatsApp HTTP API)**.
+**IDX-Intel AI v2.2.0** hadir sebagai platform intelijen pasar otonom yang menggabungkan:
+1. **Mesin Rekomendasi Kontekstual Berbasis Memori Historis:** Membaca kontinuitas aksi korporasi emiten di database sebelum menyimpulkan rekomendasi, menyajikan perspektif multi-horizon, dan menetapkan titik pembatalan analisis (*invalidation triggers*).
+2. **100% Dynamic AI-Generated Message:** Menghilangkan template statis/manual 'Detail Aksi Korporasi'; seluruh narasi latar belakang, analisis aksi, dan horizon disusun secara cerdas oleh AI.
+3. **Pemisahan Grup WhatsApp WAHA untuk Komunitas S&P 500:** Membedakan kanal pengiriman antara bursa lokal (`BROADCAST_CHAT_ID`) dan pasar global (`BROADCAST_CHAT_ID_SP500`).
+4. **Intelijen Sektor Real-Time Multi-Market (`/api/v1/sectors`):** Mengagregasi berita real-time dari TradingView, Yahoo Finance, dan CNBC untuk merekomendasikan sektor terbaik di Komoditas, S&P 500, dan IDX.
+5. **Format Notifikasi WhatsApp Terstandarisasi:** Mempertahankan label dengan format underscore (`_`) seperti `[Class: STRONG_BUY_AKUMULASI]`, `[Class: ACCUMULATE_ON_WEAKNESS]`, `[Class: HOLD_WATCH]`, dan `[Class: AVOID]`.
 
 ---
 
 ## 2. Tujuan & Ruang Lingkup Sistem
 
 ### 2.1 Tujuan Utama (Primary Objectives)
-1. **Automated Data Aggregation:** Monitoring 24/7 terhadap pengumuman BEI, KSEI, dan RSS feeds berita pasar saham.
-2. **AI-Powered Event Extraction:** Identifikasi jenis aksi korporasi secara akurat, ekstraksi parameter kuantitatif (rasio, harga pelaksanaan, tanggal penting, nilai transaksi), dan analisis potensi dampak terhadap saham/sektor.
-3. **Real-time WhatsApp Alerting:** Pengiriman notifikasi terstruktur, terformat, dan mudah dibaca langsung ke grup/nomor personal WhatsApp via WAHA.
-4. **Interactive Inbound Commands:** Kemampuan menerima perintah interaktif dari pengguna WhatsApp (misal: `/cek BBCA`, `/summary`, `/subscribe`).
-5. **Enterprise Engineering Standard:** Implementasi pola **Router-Service-Repository (FastAPI APIRouter)**, prinsip **SOLID**, serta jaminan transaksi **ACID** pada lapisan penyimpanan data.
-
-### 2.2 Ruang Lingkup Event Saham yang Dipantau (Klasifikasi Ketat 3 Kategori)
-
-Sistem menerapkan **penyaringan intelijen pasar (*Strict Filtering Pipeline*)** untuk mengeliminasi *noise* aksi korporasi rutin dan fokus 100% pada pergerakan *Smart Money* serta aksi korporasi berdaya ledak tinggi. Pengumuman dan berita HANYA diklasifikasikan ke dalam 3 (tiga) kategori berikut:
-
-1. **`"BACKDOOR_LISTING"`**:
-   - Injeksi aset/bisnis baru ke perusahaan cangkang (*shell company*) / emiten *dormant*.
-   - Perubahan kegiatan usaha utama secara drastis setelah pengambilalihan.
-   - *Reverse takeover* / Penambahan Modal Tanpa HMETD jumbo yang mengubah lini bisnis inti.
-
-2. **`"KONGLO_MOVE"`**:
-   - Akumulasi saham oleh *Smart Money*, Konglomerat, Grup Bisnis Besar (misal: Barito/Prajogo Pangestu, Salim, Djarum, Bakrie, Agung Sedayu, Panin, Chandra Asri, dll.).
-   - Transaksi *Crossing* Saham jumbo di Pasar Negosiasi oleh investor institusi/strategis.
-   - Perubahan Pemegang Saham Pengendali (PSP) atau pembelian porsi kepemilikan > 5%.
-   - *Mandatory Tender Offer* (MTO) yang dipicu oleh akuisisi grup besar.
-   - *Right Issue* yang hype.
-
-3. **`"IRRELEVANT"`**:
-   - Berita aksi korporasi rutin: *Rights Issue* biasa tanpa pembeli siaga konglo, Pembagian Dividen, Laporan Keuangan rutin, UMA/Suspensi biasa, atau berita umum yang tidak melibatkan *Backdoor Listing* / *Smart Money Accumulation*.
-
-> [!IMPORTANT]
-> **Aturan Ketat:**  
-> Jika berita **TIDAK** memuat indikasi jelas tentang *Backdoor Listing* atau Pergerakan *Smart Money* / Grup Besar, Kembalikan kategori **`"IRRELEVANT"`**.
-
-### 2.3 Sumber Data & Target Scraping (Scraper Data Sources)
-
-Sistem secara asinkron memantau **BEI (Bursa Efek Indonesia / IDX Announcements)** serta 5 (lima) mesin dan portal berita finansial dengan karakteristik, kecepatan, dan metode ekstraksi spesifik sebagai berikut:
-
-| Sumber Media / Portal | Status Biaya | Karakteristik Kecepatan (*Fast News*) | Tingkat Keamanan Anti-Bot | Metode Ekstraksi & URL Target / Endpoint |
-| :--- | :--- | :--- | :--- | :--- |
-| **0. BEI / IDX Announcements**<br>(*Keterbukaan Informasi BEI*) | **100% GRATIS**<br>(Portal Resmi) | **Resmi & Otoritatif:** Sumber primer pengumuman emiten BEI dan jadwal aksi korporasi. | **Rendah - Sedang** | • **Metode:** Plain HTTP GET / JSON API IDX<br>• **Target:** `https://www.idx.co.id/id/perusahaan-tercatat/keterbukaan-informasi` |
-| **1. Google News RSS Engine**<br>(*Pilihan Terbaik & Paling Aman*) | **100% GRATIS**<br>(Tanpa API Key / Lisensi) | **Sangat Cepat:** Mengindeks artikel media finansial nasional (CNBC, Kontan, Bisnis.com, Investor Daily) hanya dalam hitungan detik hingga menit setelah tayang. | **Sangat Rendah (Nihil):** Request ke endpoint RSS Google, tanpa proteksi Cloudflare, Akamai, atau CAPTCHA. | • **Metode:** RSS Feed Aggregator (`httpx` + BeautifulSoup)<br>• **Endpoint:** `https://news.google.com/rss/search?q={QUERY}&hl=id-ID&gl=ID&ceid=ID:id`<br>• **Contoh Query:** `site:kontan.co.id OR site:cnbcindonesia.com ("stock split" OR "rights issue" OR "akuisisi" OR "backdoor listing")` |
-| **2. RSS Feed Resmi CNBC Indonesia**<br>(*Section Market*) | **100% GRATIS** | **Sangat Cepat:** Portal paling agresif untuk *breaking news*, rumor pasar, pergerakan grup konglomerat (Barito, Salim, Bakrie, Djarum), dan UMA/Suspensi. | **Sangat Rendah:** Endpoint RSS bersih dari script & proteksi iklan web utama. | • **Metode:** RSS Feed Parsing<br>• **Endpoint:** `https://www.cnbcindonesia.com/market/rss/` |
-| **3. RSS Feed Resmi Kontan Investasi** | **100% GRATIS** | **Cepat & Sangat Detail:** Standar media digital/cetak untuk perincian aksi korporasi secara mendetail (Stock Split, Rights Issue, Tender Offer, Warrant). | **Sangat Rendah** pada endpoint RSS. | • **Metode:** RSS Feed Parsing<br>• **Endpoint:** `https://rss.kontan.co.id/news/keuangan` atau `https://investasi.kontan.co.id/rss` |
-| **4. IDN Financials**<br>(*Corporate Action Section*) | **100% GRATIS** | **Moderat:** Fokus pada kelengkapan data kuantitatif terstruktur (rasio pasti stock split, cum-date, kepemilikan >5%). | **Sangat Rendah:** Server-Side Rendering (SSR) murni tanpa proteksi WAF tingkat tinggi. | • **Metode:** Direct HTML Table Parsing<br>• **Target:** `https://www.idnfinancials.com/id/corporate-action` |
-| **5. IPOTNews**<br>(*IndoPremier News Feed*) | **100% GRATIS** | **Sangat Cepat:** Menyalin teks ringkasan Keterbukaan Informasi resmi BEI secara otomatis ke dalam format web sederhana. | **Sangat Rendah:** HTML ringan dan mudah di-parse. | • **Metode:** Plain HTTP GET (`httpx` + BeautifulSoup)<br>• **Target:** `https://www.ipotnews.com` |
+1. **Continuous Multi-Source Aggregation:** Pemantauan kontinu terhadap pengumuman resmi BEI serta feed berita real-time (TradingView, Yahoo Finance, CNBC, Kontan, Google News).
+2. **Context-Aware Corporate Action Analysis:** Menganalisis emiten dengan mempertimbangkan riwayat aksi korporasi sebelumnya di PostgreSQL, mengeliminasi kesimpulan sesaat, dan menetapkan *Invalidation Triggers*.
+3. **100% Dynamic AI-Generated Outbound Alerts:** Seluruh pesan disusun dinamis dan cerdas oleh AI tanpa template isian hardcoded.
+4. **Multi-Channel WAHA Dispatch:** Mendukung perutean notifikasi ke grup yang berbeda (`BROADCAST_CHAT_ID` untuk IDX vs `BROADCAST_CHAT_ID_SP500` untuk S&P 500).
+5. **Real-Time Sector Recommendation Engine:** Memberikan peringkat rekomendasi sektor (Komoditas Strategis, S&P 500, dan 11 Sektor IDX-IC) melalui prefix endpoint `/api/v1/sectors`.
+6. **Zero-Breaking-Change Guarantee:** Mempertahankan seluruh endpoint existing (`/api/v1/monitor`, `/events`, `/call/*`, `/chat`, `/health`) dan alur LangGraph lama tanpa interupsi.
 
 ---
 
-## 3. Arsitektur Perangkat Lunak & Prinsip Desain
+### 2.2 Taksonomi Sektor Multi-Market (3 Pilar Lengkap)
 
-Sistem dirancang secara modular dan *decoupled* menggunakan tiga pilar utama arsitektur modern:
+#### Pilar A: Sektor Komoditas Strategis Dunia (Commodities)
+1. **Timah (*Tin*):** Pasar LME-TIN, emiten terkait: `$TINS`.
+2. **Aluminium:** Pasar LME-ALU, emiten terkait: `$INAI`, `$ALMI`, `$ALUM`.
+3. **Tembaga (*Copper*):** Pasar HG1!, emiten terkait: `$AMMN`, `$MDKA`.
+4. **Nikel (*Nickel*):** Pasar LME-NICKEL, emiten terkait: `$INCO`, `$ANTM`, `$NCKL`, `$MBMA`.
+5. **Emas & Perak (*Precious Metals*):** XAUUSD, XAGUSD, emiten terkait: `$ANTM`, `$MDKA`, `$BRMS`, `$ARCI`, `$PSAB`.
+6. **Litium & Logam Baterai:** Saham lithium global (ALB, SQM), mineral kritis.
+7. **Platinum & Palladium:** PL1!, PA1! (industri otomotif & hidrogen hijau).
+8. **Minyak Mentah (*Crude Oil*):** WTI (`CL`), Brent (`BRN`), emiten terkait: `$MEDC`, `$ENRG`, `$ELSA`.
+9. **Batu Bara (*Thermal & Metallurgical Coal*):** Newcastle Coal, emiten terkait: `$ADRO`, `$PTBA`, `$ITMG`, `$BUMI`, `$BYAN`.
+10. **Gas Alam (*Natural Gas*):** NG1!, emiten terkait: `$PGAS`, `$RAJA`.
+11. **Uranium & Energi Nuklir:** Global Uranium ETF (URA), Cameco (CCJ).
+12. **Minyak Kelapa Sawit (*CPO*):** MDEX CPO, emiten terkait: `$AALI`, `$LSIP`, `$TAPG`, `$DSNG`.
 
-### 3.1 Pattern Router-Service-Repository (FastAPI APIRouter / Controller)
+#### Pilar B: Sektor S&P 500 & Global Equities (Wall Street)
+1. **Semiconductors & AI Hardware:** NVDA, TSM, AMD, AVGO, ASML, QCOM.
+2. **Mega Tech & Cloud Platforms:** MSFT, AAPL, AMZN, GOOGL, META.
+3. **US Mega Banks & Financial Services:** JPM, BAC, WFC, GS, MS.
+4. **Aerospace & Defense:** LMT, RTX, BA, NOC.
+5. **US Macro Indicators:** S&P 500 (`^GSPC`), Nasdaq 100 (`^IXIC`), US Dollar Index (`DXY`), US 10-Year Treasury Yield.
 
-```text
-                  ┌──────────────────────────────────────────┐
-                  │   Inbound Webhook / HTTP Client / Cron   │
-                  └────────────────────┬─────────────────────┘
-                                       │
-                                       ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ ROUTER LAYER (FastAPI APIRouters - Controller Layer)                       │
-│ • Validasi Request/Webhook Payload (Pydantic)                               │
-│ • Mengembalikan HTTP Status & Response                                       │
-└──────────────────────────────────────┬──────────────────────────────────────┘
-                                       │
-                                       ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ SERVICE LAYER (Business Logic & LangGraph Workflow)                         │
-│ • AgentService: Mengelola alur eksekusi LangGraph (StateGraph)              │
-│ • ScraperService: Agregasi data dari BEI / RSS Feed                         │
-│ • WahaService: Client API untuk kirim pesan ke WAHA                         │
-│ • NotificationService: Merakit pesan & mengelola antrean notifikasi        │
-└──────────────────┬──────────────────────────────────────┬───────────────────┘
-                   │                                      │
-                   ▼                                      ▼
-┌──────────────────────────────────────┐┌─────────────────────────────────────┐
-│ AI AGENT LAYER (LangGraph)           ││ REPOSITORY LAYER (Data Access)      │
-│ • Ingestion -> Classify -> Extract   ││ • EventRepository                   │
-│ • Impact Analysis -> WA Formatting   ││ • UserRepository                    │
-│                                      ││ • AlertLogRepository                │
-└──────────────────────────────────────┘└──────────────────┬──────────────────┘
-                                                           │
-                                                           ▼
-                                        ┌─────────────────────────────────────┐
-                                        │ DATABASE / CACHE LAYER              │
-                                        │ • PostgreSQL (Asyncpg + SQLAlchemy) │
-                                        │ • Redis (Cache & Session Store)     │
-                                        └─────────────────────────────────────┘
-```
-
-1. **Router Layer (`app/routers/` — Controller):**
-   - Bertanggung jawab penuh atas penanganan HTTP Request/Response.
-   - Menggunakan Pydantic Schemas untuk validasi *payload* masukan dari Webhook WAHA maupun endpoint Admin.
-   - Tidak memuat logika bisnis maupun panggilan database langsung.
-
-2. **Service Layer (`app/services/`):**
-   - Berisi seluruh logika bisnis utama aplikasi.
-   - Mengkoordinasikan eksekusi *scrapers*, pemrosesan state *LangGraph*, pemformatan notifikasi, serta pemanggilan API eksternal WAHA.
-
-3. **Repository Layer (`app/repositories/`):**
-   - Menyediakan antarmuka terisolasi untuk akses data ke database PostgreSQL.
-   - Menggunakan `SQLAlchemy` versi 2.0 dengan *async engine* (`asyncpg`) untuk menjamin performa tinggi dan keterpisahan logika query SQL dari logika bisnis.
+#### Pilar C: Sektor Bursa Efek Indonesia (IDX-IC 11 Sektor)
+1. Keuangan (*Financials*): BBCA, BBRI, BMRI, BBNI.
+2. Energi (*Energy*): ADRO, PTBA, PGAS, MEDC.
+3. Barang Baku (*Basic Materials*): ANTM, MDKA, TPIA, INCO, BRPT.
+4. Kesehatan (*Healthcare*): MIKA, HEAL, SILO, KLBF.
+5. Teknologi (*Technology*): GOTO, BUKA, EMTK, DCII.
+6. Infrastruktur (*Infrastructure*): TLKM, ISAT, TOWR, TBIG, JSMR.
+7. Konsumer Primer (*Consumer Non-Cyclical*): ICBP, INDF, UNVR, MYOR.
+8. Konsumer Non-Primer (*Consumer Cyclical*): ASII, ACES, MAPI.
+9. Perindustrian (*Industrials*): UNTR, ARNA.
+10. Properti & Real Estat (*Properties*): BSDE, CTRA, PWON, SMRA.
+11. Transportasi & Logistik (*Transportation*): SMDR, TMAS, ASSA, BIRD.
 
 ---
 
-### 3.2 Penerapan Prinsip SOLID
+### 2.3 Matriks Sumber Data & Target Scraper
 
-- **Single Responsibility Principle (SRP):** Setiap modul memiliki satu fungsi spesifik. `WAHAService` hanya menangani komunikasi HTTP ke server WAHA, `EventRepository` hanya mengurus query tabel event, dan `ExtractorNode` pada LangGraph hanya mengekstrak fakta JSON.
-- **Open/Closed Principle (OCP):** Penambahan sumber data baru (misal: Scraper KSEI) dilakukan dengan menambahkan class baru yang mengimplementasikan antarmuka `BaseScraper` tanpa perlu mengubah kode `ScraperService` utama.
-- **Liskov Substitution Principle (LSP):** Antarmuka repositori abstrak (`BaseRepository`) memastikan bahwa implementasi repositori dapat diganti (misal: *In-Memory Repository* untuk testing vs *Postgres Repository* untuk produksi) tanpa merusak *Service Layer*.
-- **Interface Segregation Principle (ISP):** Interface dirancang ringkas dan spesifik. Modul yang hanya memerlukan fungsi pengiriman notifikasi hanya mengimpor `INotificationService`.
-- **Dependency Inversion Principle (DIP):** *Service Layer* dan *Router Layer (Controller)* tidak melakukan instansiasi dependensi secara langsung (*hardcoded*), melainkan memanfaatkan Dependency Injection yang disediakan oleh framework **FastAPI (`Depends`)**.
-
----
-
-### 3.3 Jaminan Transaksi Database (ACID Compliance)
-
-Penyimpanan data aksi korporasi dan log notifikasi mengutamakan integritas data sesuai standar **ACID**:
-
-- **Atomicity (Keutuhan):** Operasi yang melibatkan penyimpanan event baru dan pembuatan log antrean notifikasi berada dalam satu transaksi (*Database Session Context Manager*). Jika terjadi kegagalan jaringan saat menyimpan event, transaksi di-`rollback` secara utuh.
-- **Consistency (Konsistensi):** Setiap event memiliki unik hash (`event_hash = SHA256(ticker + event_type + publication_date + title)`). Skema database menerapkan *Unique Constraint* pada `event_hash` untuk memblokir duplikasi data secara permanen di level database.
-- **Isolation (Isolasi):** Transaksi berjalan pada level isolasi `READ COMMITTED` (standar PostgreSQL) untuk mencegah kondisi *dirty read* saat multiple worker scraper berjalan secara simultan.
-- **Durability (Ketahanan):** Setelah transaksi di-`commit`, data tersimpan di disk PostgreSQL dengan penulisan *Write-Ahead Logging (WAL)* yang tahan terhadap mati listrik atau *restart* server.
-
----
-
-## 4. Alur Kerja Agentic AI (LangGraph StateGraph)
-
-Sistem menggunakan **LangGraph** untuk mengarsitekturi proses analisis dokumen secara bertahap (*multi-step reasoning graph*), menggantikan pendekatan single-prompt yang rentan terhadap instruksi yang terlewat.
-
-```text
-                  ┌───────────────────────────────┐
-                  │          [ START ]            │
-                  └──────────────┬────────────────┘
-                                 │
-                                 ▼
-                  ┌───────────────────────────────┐
-                  │        IngestionNode          │
-                  │  (Clean text, extract meta)   │
-                  └──────────────┬────────────────┘
-                                 │
-                                 ▼
-                  ┌───────────────────────────────┐
-                  │         ClassifierNode        │
-                  │  (Is Corporate Action? Type)  │
-                  └──────────────┬────────────────┘
-                                 │
-                   ┌─────────────┴─────────────┐
-                   │ Apakah Aksi Korporasi?    │
-                   └──────┬─────────────┬──────┘
-                       YA │             │ TIDAK
-                          ▼             ▼
-  ┌──────────────────────────┐   ┌──────────────────────────┐
-  │      ExtractorNode       │   │          [ END ]         │
-  │ (JSON Schema Extraction) │   │  (Ignore Non-Event Text) │
-  └──────────────┬───────────┘   └──────────────────────────┘
-                 │
-                 ▼
-  ┌──────────────────────────┐
-  │      ImpactNode          │
-  │ (Sentiment & Evaluation) │
-  └──────────────┬───────────┘
-                 │
-                 ▼
-  ┌──────────────────────────┐
-  │     WAFormatterNode      │
-  │ (Generate WA Markdown)   │
-  └──────────────┬───────────┘
-                 │
-                 ▼
-  ┌──────────────────────────┐
-  │          [ END ]         │
-  │ (Push to WAHA Dispatch)  │
-  └──────────────────────────┘
-```
-
-### Detail Node LangGraph:
-1. **IngestionNode:** Membersihkan teks HTML/PDF mentah, mengekstrak metadata dasar (URL sumber, tanggal publikasi, ticker saham jika terdeteksi).
-2. **ClassifierNode:** Mengklasifikasikan dokumen HANYA ke dalam 3 kategori ketat: `BACKDOOR_LISTING`, `KONGLO_MOVE`, atau `IRRELEVANT` (sesuai Aturan Ketat pemantauan *Smart Money* & *Konglomerat*).
-3. **ExtractorNode:** Menggunakan *Structured Output* (Pydantic) untuk menarik parameter kunci seperti rasio, nominal, tanggal penting (*cum/ex date*), harga pelaksanaan, dan nama entitas akuisisi.
-4. **ImpactNode:** Menganalisis dampak finansial dan sentimen (*Bullish / Bearish / Neutral*) terhadap likuiditas, struktur permodalan, dan respon pasar.
-5. **WAFormatterNode:** Menyusun hasil analisis menjadi pesan teks yang memenuhi kaidah estetika pesan WhatsApp (menggunakan emoji, cetak tebal, bullet points, dan layout rapi).
-
-### 4.2 LLM Prompt Engineering & Aturan Rekomendasi (`app/services/prompt.py`)
-Sistem menyimpan seluruh instruksi, *system prompt*, dan logika *reasoning* LLM dalam modul terpusat pada layer Business Logic Service yaitu `app/services/prompt.py`. 
-
-Modul ini mengimplementasikan dua aturan utama *prompting*:
-1. **Aturan Klasifikasi Ketat (*Strict 3-Category Classification*):**  
-   - LLM diinstruksikan untuk memvalidasi apakah pengumuman/berita secara spesifik menunjukkan **`BACKDOOR_LISTING`** atau **`KONGLO_MOVE`**.  
-   - **Aturan Ketat:** Jika berita TIDAK memuat indikasi jelas tentang *Backdoor Listing* atau pergerakan *Smart Money* / Grup Besar, sistem wajib mengembalikan kategori **`IRRELEVANT`**.
-2. **Aturan Rekomendasi Saham & Kelas Output (*Investment Recommendation Engine*):**  
-   - LLM diinstruksikan menghasilkan klasifikasi kelas output rekomendasi (*Recommendation Class*) terstruktur dan mencantumkan *headline* **`🎯 Rekomendasi : [Class: <NAMA_KELAS>]`** setelah bagian Analisis dengan kriteria sebagai berikut:
-   - **a. `STRONG_BUY_AKUMULASI` (Prioritas Tertinggi):**
-     - Diberikan apabila aksi korporasi, perubahan kepemilikan saham (> 5%), atau berita pasar menunjukkan adanya pembelian/akumulasi nyata oleh **Top 200 Orang Terkaya & Terkenal di Indonesia atau Dunia** (misalnya: Prajogo Pangestu / Grup Barito, Anthoni Salim, Boy Thohir, Robert Budi Hartono, Sukanto Tanoto, BlackRock, Vanguard, dll.).
-     - LLM diinstruksikan untuk menyoroti nama konglomerat/institusi, potensi aksi korporasi besar (*backdoor listing*, *M&A*, injeksi modal), serta strategi *following smart money*.
-   - **b. `BUY`:**
-     - Diberikan untuk aksi korporasi positif dengan valuasi dan dampak pertumbuhan organik yang jelas (misal: *Stock Split* rasio ideal, *Rights Issue* untuk ekspansi produktif tanpa dilusi berlebih).
-   - **c. `HOLD_WATCH`:**
-     - Diberikan pada aksi korporasi netral atau masih menunggu konfirmasi jadwal resmi.
-   - **d. `AVOID`:**
-     - Diberikan jika terdapat suspensi negatif, UMA berisiko tinggi tanpa fundamental, atau divestasi oleh pemegang saham pengendali.
-
----
-
-## 5. Integrasi WhatsApp Gateway (WAHA)
-
-Aplikasi memanfaatkan **WAHA (WhatsApp HTTP API)** sebagai gateway komunikasi dua arah.
-
-### 5.1 Format Outbound Notification (Alert Otomatis)
-
-Pada pesan notifikasi WAHA, *field* **Kategori** wajib diisi berdasarkan kelas aksi korporasi (*class of the action*) dari kategori utama yang teridentifikasi (`BACKDOOR_LISTING` atau `KONGLO_MOVE`), diikuti dengan rincian jenis pergerakannya, serta mencantumkan kelas rekomendasi yang dihasilkan oleh AI.
-
-```text
-🚨 [IDX-INTEL ALERT] AKSI KORPORASI 🚨
-------------------------------------------------
-Emiten  : $BUMI (PT Bumi Resources Tbk)
-Kategori: 👑 KONGLO_MOVE (Akumulasi Saham oleh Smart Money / Grup Besar)
-
-👤 Investor/Grup : Mach Energy (Grup Salim)
-🔄 Jenis Transaksi: Crossing Pasar Negosiasi / Private Placement
-
-📊 Detail Aksi Korporasi:
-• Harga Eksekusi   : Rp 120 / saham
-• Nilai Transaksi   : ± Rp 24 Triliun
-• Total Kepemilikan : 37.1% (Joint Control dengan Grup Bakrie)
-
-💡 Analisis:
-Masuknya Grup Salim memperkuat struktur permodalan dan memangkas beban utang emiten secara signifikan. Sinyal akumulasi jangka panjang.
-
-🎯 Rekomendasi [Class: STRONG_BUY_AKUMULASI] :
-STRONG BUY / AKUMULASI — Aksi korporasi didukung oleh akumulasi kepemilikan oleh Top Konglomerat Indonesia (Anthoni Salim / Grup Salim), mengindikasikan prospek ekspansi jangka panjang yang sangat kuat dan partisipasi "smart money".
-🔗 Sumber: Keterbukaan Informasi BEI (IDX Announcements)
-```
-
-### 5.2 Fitur Inbound Command (Command Handler)
-
-Pengguna dapat mengirimkan perintah via pesan WhatsApp ke nomor bot WAHA:
-
-| Perintah | Deskripsi | Contoh Respon / Output |
+| Sumber Media / Scraper | Target & Karakteristik | Metode & Endpoint |
 | :--- | :--- | :--- |
-| `/cek <TICKER>` | Menampilkan riwayat aksi korporasi terbaru dari emiten tertentu. | Menampilkan 3 event aksi korporasi terbaru $BBCA lengkap dengan ringkasan AI. |
-| `/summary` | Menampilkan ringkasan aksi korporasi di BEI dalam 24 jam terakhir. | Daftar *bullet point* aksi korporasi hari ini yang teridentifikasi oleh sistem. |
-| `/subscribe <TICKER>` | Mendaftarkan akun WA untuk mendapatkan notifikasi prioritas emiten spesifik. | "Berhasil berlangganan notifikasi instan untuk saham $BREN." |
-| `/unsubscribe <TICKER>` | Membatalkan langganan notifikasi prioritas emiten. | "Berhenti berlangganan notifikasi $BREN." |
-| `/help` | Menampilkan daftar perintah yang tersedia. | Panduan penggunaan bot IDX-Intel AI. |
-
-### 5.3 Optimasi Kinerja, Proteksi & Caching (Rate Limiting & Redis Cache)
-
-- **Rate Limiting / Throttling:**  
-  Pada perintah interaktif WhatsApp (`/cek`, `/summary`), dapat ditambahkan lapisan middleware *Rate Limiter* agar sistem terhindar dari *spam command* atau DDoS.
-- **Redis Caching:**  
-  Untuk perintah `/summary` atau `/cek <TICKER>`, hasil agregasi dapat disimpan di **Redis cache** selama **5–10 menit** guna mengurangi beban *query* ke PostgreSQL pada saat trafik tinggi.
+| **TradingView Real-Time Scraper**<br>(*Baru*) | Breaking news real-time multi-market (IDX, S&P 500, Komoditas: Timah, Aluminium, Emas, Perak, Minyak) dari Reuters, Kontan, Dow Jones, FXStreet. | HTTP Async (`httpx`)<br>`https://news-headlines.tradingview.com/v2/headlines?client=web&lang=id` |
+| **Yahoo Finance Scraper**<br>(*Baru*) | Feed terstruktur berita pasar global, komoditas energi, logam, dan makro Wall Street. | HTTP Async (`httpx`)<br>`https://query2.finance.yahoo.com/v1/finance/search` |
+| **CNBC Indonesia Market RSS** | Breaking news emiten dan pergerakan konglomerat Indonesia. | RSS Feed Parsing (`feedparser`)<br>`https://www.cnbcindonesia.com/market/rss` |
+| **BEI / IDX Announcements** | Pengumuman resmi bursa, Keterbukaan Informasi, dan prospektus emiten. | Plain HTTP GET / JSON API IDX |
+| **Google News RSS Engine** | Aggregator berita pasar modal nasional tanpa CAPTCHA. | RSS Feed Engine (`feedparser`) |
+| **Kontan Investasi RSS** | Detail aksi korporasi pasar modal Indonesia. | RSS Feed Parsing |
+| **IDN Financials** | Data kuantitatif tabel aksi korporasi dan kepemilikan saham >5%. | HTML Table Scraping |
+| **IPOTNews** | Ringkasan berita pasar modal IndoPremier. | HTML Parsing |
 
 ---
 
-## 6. Structure Folder & Layout Proyek (Python 3.12)
+## 3. Arsitektur Router-Service-Repository & SOLID Compliance
 
-Proyek ini menggunakan struktur modular modern berstandar industri:
+```text
+       REQUEST (WAHA Webhook / CRON / Client API)
+                         │
+                         ▼
+   ┌───────────────────────────────────────────────┐
+   │                 ROUTER LAYER                  │
+   │  • health.py, webhook.py, monitor.py, call.py │ ◄── [Existing Endpoints TETAP UTUH]
+   │  • sectors.py (/api/v1/sectors/*)             │ ◄── [Prefix Endpoint Sektor Baru]
+   └──────────────────────┬────────────────────────┘
+                          │
+                          ▼
+   ┌───────────────────────────────────────────────┐
+   │                SERVICE LAYER                  │
+   │  • AgentExecutionService & WahaService        │
+   │  • SectorCoordinatorService                   │ ◄── [Aggregator Multi-Scraper]
+   │  • SectorIntelligenceService                  │ ◄── [AI Sector Stance & Katalis]
+   └──────────────────────┬────────────────────────┘
+                          │
+          ┌───────────────┴───────────────┐
+          ▼                               ▼
+   ┌─────────────┐                 ┌─────────────┐
+   │  AI AGENTS  │                 │ REPOSITORY  │
+   │ (LangGraph) │                 │ (EventRepo) │ ◄── [Injeksi 5 Event Historis]
+   └─────────────┘                 └──────┬──────┘
+                                          │
+                                          ▼
+                                [ PostgreSQL / Redis ]
+```
+
+---
+
+## 4. Mesin Rekomendasi Kontekstual Multi-Horizon
+
+### 4.1 Injeksi Memori Historis Emiten
+Sebelum `recommendation_node` memproses dokumen berita emiten, sistem mengeksekusi:
+```python
+past_events = await event_repo.get_latest_by_ticker(ticker, limit=5)
+```
+Ringkasan peristiwa masa lalu emiten (seperti gadai saham, restrukturisasi utang, atau akuisisi) diinjeksikan ke prompt LLM, memastikan sistem memahami *arah cerita* emiten dan tidak tertipu oleh fluktuasi sesaat.
+
+### 4.2 Standar Kelas Rekomendasi dengan Underscore (`_`)
+Output rekomendasi dikirim dengan format headline baku:
+`🎯 Rekomendasi : [Class: <LABEL_UNDERSCORE>]`
+
+Daftar Stance Baku:
+- `STRONG_BUY_AKUMULASI`: Akumulasi nyata oleh Top Konglomerat / Smart Money dengan fundamental kuat.
+- `BUY`: Aksi korporasi positif dengan ekspansi organik yang jelas.
+- `ACCUMULATE_ON_WEAKNESS`: Beli bertahap saat harga mengalami koreksi teknikal ke area support.
+- `MOMENTUM_BUY`: Beli saat terjadi breakout volume tinggi.
+- `STRATEGIC_HOLD`: Tahan untuk investasi jangka panjang.
+- `HOLD_WATCH`: Pantau konfirmasi prospektus resmi.
+- `WAIT_AND_SEE`: Tunggu kejelasan regulasi atau pemenuhan kuota.
+- `AVOID`: Suspensi berisiko, delisting, atau wanprestasi.
+- `AVOID_HIGH_RISK`: Risiko likuidasi repo / utang macet.
+
+### 4.3 Multi-Horizon Outlook & Invalidation Triggers
+Pesan rekomendasi wajib memuat:
+- **Horizon Investasi:**
+  * Jangka Pendek (1–14 hari): Sentimen sesaat & likuiditas.
+  * Jangka Menengah (1–3 bulan): Realisasi aksi korporasi & RUPS.
+  * Jangka Panjang (6–12+ bulan): Valuasi fundamental & sinergi grup.
+- **Invalidation Trigger:** Kondisi spesifik di mana analisis ini batal/gugur.
+
+---
+
+## 5. Spesifikasi Prefix Endpoint `/api/v1/sectors` & Konfigurasi Multi-Grup WAHA
+
+### 5.1 Konfigurasi Target Grup WAHA (`app/config.py`)
+```python
+BROADCAST_CHAT_ID: str = Field(description="Target WhatsApp Group ID for IDX Corporate Actions & IDX Sector Alerts")
+BROADCAST_CHAT_ID_SP500: str | None = Field(default=None, description="Dedicated WhatsApp Group ID for S&P 500 & Global Sector Intelligence")
+```
+
+### 5.2 Daftar Endpoint REST API:
+
+| Method | Endpoint | Deskripsi |
+| :--- | :--- | :--- |
+| `GET` | `/api/v1/sectors/recommendations` | Mengembalikan rekomendasi sektor AI (Komoditas, S&P 500, IDX). Query: `?category=commodity`, `sp500`, `idx`. |
+| `POST` | `/api/v1/sectors/scrape-and-analyze` | Trigger scraping simultan TradingView, Yahoo Finance, CNBC, lalu menjalankan sintesis AI. Mendukung param `?broadcast=true` untuk mem-push alert ke grup masing-masing (IDX ke `BROADCAST_CHAT_ID`, S&P 500 ke `BROADCAST_CHAT_ID_SP500`). |
+| `GET` | `/api/v1/sectors/{category}/{sector_name}` | Deep-dive analisis mendalam untuk satu sektor tertentu (misal: `commodity/tin` atau `idx/energy`). |
+| `GET` | `/api/v1/sectors/news/realtime` | Feed berita real-time terkonsolidasi dari ketiga sumber yang telah dipetakan ke sektor. |
+
+---
+
+## 6. Format Pesan WhatsApp (100% Dynamic AI-Generated & Dedicated Groups)
+
+### 6.1 Format Alert Aksi Korporasi Emiten (100% Narasi AI — Tanpa Template Detail Statis)
+*Target: `BROADCAST_CHAT_ID` (Grup Saham IDX / Indonesia)*
+```markdown
+🚨 *[IDX-INTEL ALERT] KONGLO MOVE / AKUMULASI STRATEGIS* 🚨
+Emiten: $BUMI
+
+PT Bumi Resources Tbk terdeteksi mengalami manuver aksi korporasi strategis dengan keterlibatan aktif Mach Energy (konsorsium Grup Salim bersama Grup Bakrie). Masuknya modal institusi berskala jumbo ini secara fundamental mentransformasi struktur neraca keuangan emiten dengan memangkas beban utang historis dan mengamankan kepemilikan pengendali bersama sebesar 37,1%.
+
+*Analisis Dampak & Strategi:*
+Injeksi likuiditas dan masuknya Grup Salim memberikan stabilitas arus kas operasional jangka panjang dan mempercepat diversifikasi ke hilirisasi mineral energi baru. Hal ini menjadi katalis penting re-rating valuasi emiten dari persepsi saham berisiko tinggi menjadi emiten komoditas terintegrasi konglomerasi tier-1.
+
+*🎯 Rekomendasi : [Class: STRONG_BUY_AKUMULASI]*
+💡 STRONG_BUY_AKUMULASI — Didukung oleh pergerakan tier-1 konglomerat / prospek ekspansi kuat.
+
+*Horizon Investasi:*
+• Jangka Pendek (1-14 hr): Momentum volume transaksi pasar reguler sangat tinggi, waspadai fluktuasi jangka pendek saat menguji area resisten psikologis.
+• Jangka Menengah (1-3 bln): Menunggu konfirmasi prospektus resmi RUPSLB dan jadwal penyesuaian hak suara di KSEI.
+• Jangka Panjang (6-12+ bln): Struktur modal yang lebih sehat membuka ruang pembagian dividen dan pertumbuhan laba bersih tahunan yang berkelanjutan.
+
+*Batas Pembatalan Analisis (Invalidation Trigger):*
+⚠️ Transaksi pengalihan saham gagal diselesaikan di kustodian (KSEI) atau terjadi sengketa restrukturisasi utang baru yang tidak terselesaikan.
+⚠️ Harga saham menembus ke bawah batas level support kritis Rp 95 dengan volume jual masif.
+
+*Panduan Aksi:*
+💡 Akumulasi bertahap saat harga mengalami koreksi teknikal ke area support, hindari membeli saat lonjakan sesaat di awal pembukaan sesi.
+
+Sumber Berita: https://www.idx.co.id/id/perusahaan-tercatat/keterbukaan-informasi
+```
+
+### 6.2 Format Alert Intelijen Sektor Indonesia `[IDX-INTEL SECTOR INTELLIGENCE]`
+*Target: `BROADCAST_CHAT_ID` (Grup Saham IDX / Indonesia)*
+```markdown
+🇮🇩 *[IDX-INTEL SECTOR INTELLIGENCE]* 🌐
+Tanggal: 16 Oktober 2026 | Sesi: Real-Time Market Update
+------------------------------------------------
+
+🔥 SEKTOR UNGGULAN BURSA EFEK INDONESIA:
+• Sektor Logam & Bahan Baku (Timah & Nikel) : [Class: OVERWEIGHT] (Skor: +0.78)
+  - Analisis AI: Pengetatan kuota ekspor RKAB timah dan lonjakan permintaan nikel kelas baterai memicu potensi ekspansi margin emiten tambang domestik.
+  - Top Picks: $TINS, $INCO, $NCKL
+• Sektor Energi (Minyak & Batu Bara) : [Class: NEUTRAL] (Skor: +0.25)
+  - Analisis AI: Harga minyak Brent bertahan di atas US$100 mengimbangi tren konsolidasi harga batu bara Newcastle di kisaran US$145.
+  - Top Picks: $MEDC, $ADRO, $PTBA
+• Sektor Keuangan (Big Banks) : [Class: HOLD_WATCH] (Skor: +0.05)
+  - Analisis AI: Pasar sedang mencerna dinamika peninjauan status pasar saham oleh MSCI; valuasi perbankan besar tetap atraktif untuk horizon jangka panjang.
+  - Top Picks: $BBCA, $BMRI
+
+💡 Rekomendasi Rotasi Sektor:
+Alokasikan porsi portofolio secara terukur pada sektor komoditas logam timah ($TINS) dan nikel sebagai hedging portofolio jangka pendek.
+```
+
+### 6.3 Format Alert Intelijen Sektor S&P 500 `[S&P500-INTEL AI SECTOR INTELLIGENCE]`
+*Target: `BROADCAST_CHAT_ID_SP500` (Grup Khusus S&P 500 & Global)*
+```markdown
+🇺🇸 *[S&P500-INTEL AI SECTOR INTELLIGENCE]* 🌐
+Tanggal: 16 Oktober 2026 | Sesi: Wall Street & Global Market Outlook
+------------------------------------------------
+
+⚡ 1. WALL STREET & S&P 500 LEADING SECTORS:
+• US Semiconductors & AI Infrastructure : [Class: OVERWEIGHT] (Skor: +0.84)
+  - Analisis AI: Permintaan GPU enterprise dan akselerasi infrastruktur server AI melampaui ekspektasi konsensus analis; belanja modal hyperscaler tetap agresif.
+  - Top Picks: NVDA, TSM, AMD, AVGO
+• Cloud Computing & Cybersecurity : [Class: OVERWEIGHT] (Skor: +0.70)
+  - Analisis AI: Ketahanan pengeluaran korporasi terhadap keamanan siber dan adopsi cloud hybrid memberikan visibilitas pendapatan tahunan yang solid.
+  - Top Picks: MSFT, CRWD, PANW
+• US Mega Financials : [Class: NEUTRAL] (Skor: +0.15)
+  - Analisis AI: Margin bunga bersih bank Wall Street stabil, namun provisi kredit konsumen mulai menunjukkan normalisasi.
+  - Top Picks: JPM, GS, MS
+
+🌍 2. GLOBAL COMMODITIES & MACRO:
+• Logam Mulia (Gold & Silver) : [Class: OVERWEIGHT] (Skor: +0.85)
+  - Analisis AI: Pelemahan Indeks Dolar AS (DXY ke 101.8) dan permintaan lindung nilai safe-haven di tengah ketegangan geopolitik mendorong reli emas & perak.
+  - Top Picks: XAUUSD, XAGUSD
+• Logam Industri (Aluminium & Tembaga) : [Class: ACCUMULATE_ON_WEAKNESS] (Skor: +0.65)
+  - Analisis AI: Kebijakan stimulus manufaktur global dan proyek transmisi jaringan energi hijau menopang konsumsi tembaga dan aluminium dunia.
+  - Top Picks: LME-Copper, LME-Aluminium
+
+💡 S&P 500 Portfolio Stance:
+Pertahankan bobot Overweight pada semikonduktor AI hardware dan aset lindung nilai emas (Gold).
+```
+
+---
+
+## 7. Structure Folder & File Layout Proyek
 
 ```text
 idx_intel_ai/
 ├── app/
-│   ├── __init__.py
-│   ├── main.py                     # Entry point FastAPI & Lifespan Handler
-│   ├── config.py                   # Configuration Loader (Pydantic Settings)
+│   ├── main.py                     # Entry point FastAPI & Router Registration
+│   ├── config.py                   # Pydantic Settings (BROADCAST_CHAT_ID & BROADCAST_CHAT_ID_SP500)
 │   │
-│   ├── routers/                    # Layer 1: HTTP API Routers & Webhooks (APIRouter / Controller)
-│   │   ├── __init__.py
-│   │   ├── health.py               # Endpoint /health & /metrics
-│   │   ├── webhook.py              # Endpoint /webhook/waha (Inbound Messages)
-│   │   └── monitor.py              # Endpoint /api/v1/monitor (Manual Trigger)
+│   ├── routers/                    # Layer 1: HTTP API Routers (Controller)
+│   │   ├── health.py               # /health
+│   │   ├── webhook.py              # /webhook/waha
+│   │   ├── monitor.py              # /api/v1/monitor & /events [TETAP UTUH]
+│   │   ├── call.py                 # /call/* [TETAP UTUH]
+│   │   ├── chat.py                 # /api/v1/chat [TETAP UTUH]
+│   │   └── sectors.py              # /api/v1/sectors/* [ROUTER BARU]
 │   │
 │   ├── services/                   # Layer 2: Business Logic Services
-│   │   ├── __init__.py
-│   │   ├── prompt.py               # Pusat Instruksi, System Prompt & Aturan Rekomendasi LLM
-│   │   ├── scraper.py              # Agregasi & Koordinasi Scraper
-│   │   ├── agent.py                # Pengelola Eksekusi LangGraph Pipeline
-│   │   ├── waha.py                 # HTTP Client untuk WAHA API Endpoint
-│   │   └── notification.py         # Logika Format & Dispatch Notifikasi
+│   │   ├── prompt.py               # Pusat Prompt LLM & WA Formatter (100% Dynamic AI)
+│   │   ├── scraper.py              # ScraperCoordinatorService
+│   │   ├── agent.py                # AgentExecutionService
+│   │   ├── waha.py                 # WAHA Client API
+│   │   ├── sector_mapping.py       # [BARU] Pemetaan IDX, S&P 500, Komoditas Lengkap
+│   │   └── sector_service.py       # [BARU] SectorIntelligenceService & Multi-WAHA Group Dispatch
 │   │
 │   ├── agents/                     # AI Orchestration (LangGraph)
-│   │   ├── __init__.py
-│   │   ├── graph.py                # Konstruksi StateGraph & Compilation
-│   │   ├── state.py                # Definisi TypedDict State
-│   │   └── nodes/                  # Node Implementations
-│   │       ├── __init__.py
+│   │   ├── workflow.py             # Konstruksi StateGraph
+│   │   ├── state.py                # TypedDict AgentState
+│   │   └── nodes/
 │   │       ├── ingestion_node.py
 │   │       ├── classifier_node.py
 │   │       ├── extractor_node.py
 │   │       ├── impact_node.py
-│   │       └── formatter_node.py
+│   │       ├── recommendation_node.py # [ENHANCED] Memori Historis & Multi-Horizon
+│   │       └── wa_formatter_node.py
 │   │
 │   ├── repositories/               # Layer 3: Database Access (ACID)
-│   │   ├── __init__.py
-│   │   ├── base_repository.py      # Abstract Generic Repository Interface
-│   │   ├── event_repository.py     # SQLAlchemy Async Event Queries
-│   │   ├── user_repository.py      # Management User & Subscriptions
-│   │   └── alert_log_repository.py # History Log Pengiriman Notifikasi
+│   │   ├── event_repository.py     # get_latest_by_ticker (History fetcher)
+│   │   └── ...
 │   │
-│   ├── models/                     # SQLAlchemy ORM Models
-│   │   ├── __init__.py
-│   │   ├── base.py                 # Declarative Base Class
-│   │   ├── event_model.py          # Tabel corporate_events
-│   │   ├── user_model.py           # Tabel users & subscriptions
-│   │   └── alert_log_model.py      # Tabel alert_logs
+│   ├── scrapers/                   # Data Ingestion (BaseScraper Pattern)
+│   │   ├── base_scraper.py
+│   │   ├── cnbc_rss_scraper.py
+│   │   ├── tradingview_news_scraper.py # [BARU] Real-Time Multi-Market Scraper
+│   │   ├── yahoo_finance_scraper.py    # [BARU] Real-Time Global & Commodity Scraper
+│   │   └── ...
 │   │
-│   ├── schemas/                    # Pydantic Schemas / DTOs
-│   │   ├── __init__.py
-│   │   ├── waha_schema.py          # Payload Model WAHA Webhook
-│   │   ├── event_schema.py         # Schema Extracted Event Fact
-│   │   └── response_schema.py      # Standard HTTP API Response Format
-│   │
-│   ├── scrapers/                   # Data Acquisition Module (OCP)
-│   │   ├── __init__.py
-│   │   ├── base_scraper.py         # Abstract Base Scraper Interface
-│   │   ├── idx_announcement_scraper.py # Scraper Keterbukaan Informasi Resmi BEI
-│   │   ├── google_news_rss_scraper.py # Scraper Google News RSS Engine (Aggregator)
-│   │   ├── cnbc_rss_scraper.py     # Scraper RSS Resmi CNBC Indonesia Market
-│   │   ├── kontan_rss_scraper.py   # Scraper RSS Resmi Kontan Investasi
-│   │   ├── idn_financials_scraper.py # Scraper IDN Financials Corporate Action (Tabel HTML)
-│   │   └── ipotnews_scraper.py     # Scraper IPOTNews / IndoPremier News Feed
-│   │
-│   └── utils/                      # Utilities & Helpers
-│       ├── __init__.py
-│       ├── logger.py               # Structured Logging (structlog)
-│       └── db_session.py           # Async Database Session Generator
+│   └── schemas/
+│       ├── event_schema.py         # MultiHorizonOutlook & InvestmentThesis
+│       └── ...
 │
-├── docker/
-│   ├── Dockerfile                  # Multi-stage Python 3.12 Dockerfile
-│   └── docker-compose.yml          # Compose File: App + Postgres + Redis + WAHA
-│
-├── migrations/                     # Database Migrations (Alembic)
-│   ├── versions/
-│   └── env.py
-│
-├── tests/                          # Automated Tests
-│   ├── unit/                       # Unit Test Services & Nodes
-│   └── integration/                # Integration Test Webhooks & Repositories
-│
-├── .env.example                    # Sample Environment Variables
-├── .env                            # Environment Variables
-├── .gitignore
-├── alembic.ini                     # Configuration Alembic
-├── README.md                       # Dokumentasi Instalasi & Cara Jalankan
-└── requirements.txt                # Dependensi Python 3.12
+└── tests/
+    ├── test_sector_intelligence.py # [BARU] Unit Tests Scrapers & Sector Mapper
+    └── test_recommendation_engine.py
 ```
 
 ---
 
-## 7. Dependensi & Library (`requirements.txt`)
+## 8. Panduan Eksekusi Terminal (Code in Terminal)
 
-Seluruh library telah diuji kompatibilitasnya dengan **Python 3.12**:
+```bash
+# 1. Menjalankan pengujian otomatis:
+cd backend
+python -m pytest tests/test_sector_intelligence.py -v
+python -m pytest tests/test_recommendation_engine.py -v
 
-```text
-# Web Framework & API Server
-fastapi>=0.111.0
-uvicorn[standard]>=0.30.0
-pydantic>=2.7.0
-pydantic-settings>=2.2.0
+# 2. Trigger Scraping & Analisis Sektor Real-Time:
+curl.exe -X POST "http://localhost:8045/api/v1/sectors/scrape-and-analyze" -H "Content-Type: application/json"
 
-# AI Orchestration & LLM Integration
-langgraph>=0.1.5
-langchain>=0.2.0
-langchain-openai>=0.1.7
-langchain-community>=0.2.0
+# 3. Mengambil Rekomendasi Sektor (Semua Kategori):
+curl.exe -s "http://localhost:8045/api/v1/sectors/recommendations" | jq .
 
-# Web Scraping & Data Acquisition
-httpx>=0.27.0
-beautifulsoup4>=4.12.3
-feedparser>=6.0.10
-playwright>=1.44.0
+# 4. Mengambil Rekomendasi Sektor Khusus Komoditas (Timah, Aluminium, Emas, dll.):
+curl.exe -s "http://localhost:8045/api/v1/sectors/recommendations?category=commodity" | jq .
 
-# Database Persistence (ACID & Async)
-SQLAlchemy[asyncio]>=2.0.30
-asyncpg>=0.29.0
-alembic>=1.13.1
-redis>=5.0.4
-
-# Task Scheduling & Background Jobs
-apscheduler>=3.10.4
-
-# Security, Logging & Helpers
-python-dotenv>=1.0.1
-structlog>=24.1.0
-
-# Testing Suite
-pytest>=8.2.0
-pytest-asyncio>=0.23.0
+# 5. Deep-Dive Sektor Tertentu (Contoh: Timah / Tin):
+curl.exe -s "http://localhost:8045/api/v1/sectors/commodity/tin" | jq .
 ```
 
 ---
 
-## 8. Requirements Non-Fungsional & Keamanan
+## 9. Kesimpulan
 
-1. **Performansi & Caching (Performance):**
-   - Latensi respon HTTP Webhook WAHA < 1.5 detik (menggunakan pemrosesan *async background task*).
-   - Waktu eksekusi siklus *LangGraph* per dokumen pengumuman < 8.0 detik.
-   - **Redis Caching:** Untuk perintah `/summary` atau `/cek <TICKER>`, hasil agregasi disimpan di Redis cache selama 5–10 menit guna mengurangi beban query ke PostgreSQL pada saat trafik tinggi.
-2. **Keandalan (Reliability & Deduplication):**
-   - Mekanisme *retry* otomatis dengan *Exponential Backoff* saat memanggil WAHA API jika terjadi gangguan koneksi sementara.
-   - Pengecekan *duplicate event* berbasis SHA-256 Hash di level *Repository* sebelum memicu *LangGraph Agent*, menghemat penggunaan kredit LLM API hingga 60%.
-3. **Keamanan & Proteksi Trafik (Security & Throttling):**
-   - Otentikasi Webhook WAHA menggunakan header `X-Api-Key` atau Secret Token.
-   - Sanitasi input pesan teks dari pengguna WhatsApp untuk mencegah serangan *Prompt Injection* ke modul LLM.
-   - **Rate Limiting / Throttling:** Pada perintah interaktif WhatsApp (`/cek`, `/summary`), ditambahkan lapisan middleware *Rate Limiter* agar sistem terhindar dari *spam command* atau DDoS.
-
----
-
-## 9. Roadmap Pengembangan & Milestone
-
-| Fase | Target | Luaran Utama (Deliverables) |
-| :--- | :--- | :--- |
-| **Fase 1** | Setup Proyek, Environment Python 3.12, Docker Compose (FastAPI + PostgreSQL + Redis + WAHA), Schema DB & Migrasi Alembic. |
-| **Fase 2** | Implementasi `BaseScraper`, `IDXAnnouncementScraper`, `GoogleNewsRSSScraper`, `CNBCRSSScraper`, `KontanRSSScraper`, `IDNFinancialsScraper`, `IPOTNewsScraper`, dan `EventRepository` dengan jaminan transaksi ACID. |
-| **Fase 3** | Pembangunan StateGraph **LangGraph**: Ingestion, Classifier, Extractor, Impact Evaluator, dan WA Formatter Nodes. |
-| **Fase 4** | Integrasi `WAHAService` & Webhook Handler, Pengolahan Inbound Commands (`/cek`, `/summary`, `/subscribe`). |
-| **Fase 5** | Unit & Integration Testing, Optimasi Prompt LLM, Stress Test Webhook, serta Deployment ke Server Staging. |
-
----
-
-## 10. Kesimpulan
-
-PRD versi ini memberikan panduan komprehensif dalam membangun sistem pemantau aksi korporasi **IDX-Intel AI**. Melalui kombinasi arsitektur **Router-Service-Repository (FastAPI APIRouter)**, kepatuhan penuh terhadap **Prinsip SOLID**, pengelolaan transaksi berjaminan **ACID**, *orchestration* berbasis **LangGraph**, serta integrasi **WAHA**, sistem ini menjamin keandalan, skalabilitas, dan kecepatan penyampaian *market intelligence* bagi para pelaku pasar saham Indonesia.
+Dokumen PRD v2.2.0 ini menetapkan standar arsitektural yang kokoh untuk **IDX-Intel AI**. Melalui peningkatan mesin rekomendasi berbasis memori historis multi-horizon, narasi pesan yang 100% dinamis buatan AI, penambahan intelijen sektor real-time (IDX, S&P 500, dan Komoditas Strategis Lengkap), serta pemisahan target grup WhatsApp WAHA untuk komunitas IDX dan S&P 500, sistem memberikan keunggulan kompetitif bernilai tinggi bagi pengambilan keputusan investasi.

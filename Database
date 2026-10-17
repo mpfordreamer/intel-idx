@@ -2,7 +2,7 @@
 
 ## Mengapa PostgreSQL, Bukan SQLite?
 
-Pemilihan **PostgreSQL 16** dibandingkan **SQLite** dalam [docker-compose.yml](file:///c:/Users/dewam/Dokumen/Project%20AI%20and%20Website/Ternak%20AI/Invest-Automation/docker-compose.yml) didasari oleh kebutuhan arsitektur sistem real-time intelligence pasar modal:
+Pemilihan **PostgreSQL 16** dibandingkan **SQLite** dalam [docker-compose.yml](file:///c:/Users/dewam/Dokumen/Project%20AI%20and%20Website/Ternak-AI/Invest-Automation/docker-compose.yml) didasari oleh kebutuhan arsitektur sistem real-time intelligence pasar modal:
 
 1. **Konkurensi & Async I/O Tinggi (`asyncpg`)**:
    - IDX-Intel AI menjalankan **6 scraper paralel** (`IDXAnnouncementScraper`, `GoogleNewsRSSScraper`, `CNBCRSSScraper`, `KontanRSSScraper`, `IDNFinancialsScraper`, `IPOTNewsScraper`), menerima webhook real-time dari WAHA, serta melayani perintah interaktif dari puluhan/ratusan user WhatsApp (`/cek <TICKER>`, `/summary`).
@@ -119,14 +119,14 @@ Untuk memudahkan Anda menginspeksi isi tabel database secara langsung tanpa haru
 ### 1. Script CLI Interaktif (`scripts/show_tables.py`)
 Script Python sederhana yang menggunakan SQLAlchemy Async untuk menampilkan ringkasan jumlah baris dan 5 data terbaru dari setiap tabel di terminal dalam format tabel.
 
-#### [NEW] [show_tables.py](file:///c:/Users/dewam/Dokumen/Project%20AI%20and%20Website/Ternak%20AI/Invest-Automation/scripts/show_tables.py)
+#### [NEW] [show_tables.py](file:///c:/Users/dewam/Dokumen/Project%20AI%20and%20Website/Ternak-AI/Invest-Automation/scripts/show_tables.py)
 - Menampilkan jumlah baris di tabel `corporate_events`, `users`, `user_subscriptions`, dan `alert_logs`.
 - Menampilkan cuplikan 5 rekor terbaru dari `corporate_events` (Ticker, Event Type, Recommendation Class, dan Judul).
 
 ### 2. Endpoint REST API (`GET /api/v1/monitor/tables`)
-Menambahkan endpoint baru di [app/routers/monitor.py](file:///c:/Users/dewam/Dokumen/Project%20AI%20and%20Website/Ternak%20AI/Invest-Automation/app/routers/monitor.py) agar Anda dapat melihat statistik tabel langsung dari browser (Swagger UI `http://localhost:8000/docs`).
+Menambahkan endpoint baru di [app/routers/monitor.py](file:///c:/Users/dewam/Dokumen/Project%20AI%20and%20Website/Ternak-AI/Invest-Automation/app/routers/monitor.py) agar Anda dapat melihat statistik tabel langsung dari browser (Swagger UI `http://localhost:8000/docs`).
 
-#### [MODIFY] [monitor.py](file:///c:/Users/dewam/Dokumen/Project%20AI%20and%20Website/Ternak%20AI/Invest-Automation/app/routers/monitor.py)
+#### [MODIFY] [monitor.py](file:///c:/Users/dewam/Dokumen/Project%20AI%20and%20Website/Ternak-AI/Invest-Automation/app/routers/monitor.py)
 - Menambahkan route `GET /api/v1/monitor/tables` yang mengembalikan JSON statistik jumlah baris per tabel dan daftar emiten yang telah diproses.
 
 ---

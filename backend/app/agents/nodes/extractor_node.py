@@ -17,8 +17,9 @@ def _fallback_regex_extract(title: str, text: str) -> dict[str, Any]:
     Regex fallback extractor for execution price, transaction value, and Konglo investor group.
     """
     content = f"{title}\n{text}"
+    is_pledge_or_debt = bool(re.search(r"\b(?:agunan|gadai|pinjaman|kredit|utang|repo)\b", content, re.IGNORECASE))
     data: dict[str, Any] = {
-        "action_type": "Corporate Action / Crossing",
+        "action_type": "Agunan Saham / Fasilitas Kredit" if is_pledge_or_debt else "Corporate Action / Crossing",
         "investor_or_group": None,
         "execution_price_idr": None,
         "transaction_value_idr": None,
@@ -38,7 +39,14 @@ def _fallback_regex_extract(title: str, text: str) -> dict[str, Any]:
         ("Hermanto Tanoko", r"\b(?:hermanto tanoko|avrs|cleo)\b"),
     ]
     for group_name, pattern in konglo_list:
-        if re.search(pattern, content, re.IGNORECASE):
+        m = re.search(pattern, content, re.IGNORECASE)
+        if m:
+            # Check surrounding context: do not extract if cited merely as a historical risk analogy
+            start = max(0, m.start() - 35)
+            end = min(len(content), m.end() + 35)
+            surrounding = content[start:end].lower()
+            if re.search(r"\b(?:risiko|kasus|seperti|membayangi|krisis)\b", surrounding):
+                continue
             data["investor_or_group"] = group_name
             break
 

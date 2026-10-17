@@ -21,11 +21,10 @@ def _fallback_impact_analysis(ticker: str, category: str, extracted: dict | None
             f"Injeksi aset dan perubahan kegiatan usaha berpotensi mengubah prospek fundamental ${ticker.upper()} secara drastis. "
             f"Dukungan strategis dari {investor} memberikan kepastian permodalan baru bagi ekspansi jangka panjang."
         )
+    investor_info = f"terkait {investor}" if investor and investor != "-" else "pada emiten"
     variations = [
-        f"Masuknya {investor} memperkuat struktur permodalan dan berpotensi memangkas beban keuangan emiten secara signifikan. Sinyal akumulasi jangka panjang dari institusi dan 'smart money'.",
-        f"Kehadiran {investor} memberikan katalis positif bagi likuiditas dan postur neraca perusahaan. Hal ini mengindikasikan tingginya kepercayaan investor institusi terhadap prospek bisnis ke depan.",
-        f"Suntikan dana dan dukungan strategis dari {investor} diharapkan dapat mengoptimalkan efisiensi operasional emiten. Langkah ini sering dikaitkan dengan pergerakan 'value investing' dari pelaku pasar besar.",
-        f"Keterlibatan {investor} mencerminkan sinyal penguatan fundamental jangka panjang. Ini menjadi indikator awal adanya potensi rotasi arus modal strategis ke dalam emiten terkait."
+        f"Aktivitas korporasi terdeteksi {investor_info}. Pelaku pasar disarankan mencermati keterbukaan informasi resmi untuk memverifikasi arah transaksi dan dampak fundamentalnya.",
+        f"Informasi keterbukaan terdeteksi {investor_info}. Investor diimbau memverifikasi detail transaksi pada prospektus atau laporan resmi emiten guna mengukur eksposur risiko dan dampaknya.",
     ]
     return random.choice(variations)
 

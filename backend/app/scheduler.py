@@ -7,6 +7,8 @@ from app.scrapers.idx_announcement_scraper import IDXAnnouncementScraper
 from app.scrapers.google_news_rss_scraper import GoogleNewsRSSScraper
 from app.scrapers.cnbc_rss_scraper import CNBCRSSScraper
 from app.scrapers.kontan_rss_scraper import KontanRSSScraper
+from app.scrapers.tradingview_news_scraper import TradingViewNewsScraper
+from app.scrapers.yahoo_finance_scraper import YahooFinanceScraper
 from app.services.agent import AgentExecutionService
 from app.utils.logger import get_logger
 
@@ -17,7 +19,9 @@ scrapers = [
     IDXAnnouncementScraper(),
     GoogleNewsRSSScraper(),
     CNBCRSSScraper(),
-    KontanRSSScraper()
+    KontanRSSScraper(),
+    TradingViewNewsScraper(),
+    YahooFinanceScraper(),
 ]
 
 # Global background queue for scraped documents

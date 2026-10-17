@@ -4,7 +4,9 @@ from app.config import get_settings
 from app.repositories.alert_log_repository import AlertLogRepository
 from app.repositories.user_repository import UserRepository
 from app.schemas.waha_schema import WAHASendTextRequest
+from app.services.sector_mapping import SP500_TAXONOMY
 from app.utils.db_session import async_session_factory
+from app.utils.errors import is_token_or_quota_error
 from app.utils.logger import get_logger
 
 logger = get_logger("agents.notification")
@@ -22,7 +24,11 @@ async def notification_node(state: AgentState) -> dict:
     wa_msg = state.get("wa_formatted_message", "")
     event_id = state.get("saved_event_id")
 
-    if not wa_msg:
+    if not wa_msg or not wa_msg.strip() or is_token_or_quota_error(wa_msg):
+        logger.warning(
+            "🛑 [TOKEN HABIS / OUTBOUND SUPPRESSED] Alert dibatalkan dari WhatsApp karena pesan kosong atau terindikasi token/kuota habis.",
+            ticker=doc.ticker,
+        )
         return {"notified_subscribers_count": 0}
 
     subscribers: list[str] = []
@@ -33,8 +39,16 @@ async def notification_node(state: AgentState) -> dict:
     except Exception as e:
         logger.warning(f"Failed to fetch subscribers from DB: {e}")
 
-    if settings.BROADCAST_CHAT_ID and settings.BROADCAST_CHAT_ID not in subscribers:
-        subscribers.append(settings.BROADCAST_CHAT_ID)
+    # Determine broadcast channel: US channel for US equities, IDX channel for BEI
+    us_tickers = {t for info in SP500_TAXONOMY.values() for t in info.get("tickers", [])}
+    is_us = (
+        doc.source_name in ("TRADINGVIEW_REALTIME", "YAHOO_FINANCE", "YAHOO_FINANCE_US")
+        or doc.ticker.upper() in us_tickers
+    )
+    broadcast_target = (settings.BROADCAST_CHAT_ID_SP500 or settings.BROADCAST_CHAT_ID) if is_us else settings.BROADCAST_CHAT_ID
+
+    if broadcast_target and broadcast_target not in subscribers:
+        subscribers.append(broadcast_target)
 
     if not subscribers:
         logger.info("No active subscribers or broadcast chat for ticker", ticker=doc.ticker)

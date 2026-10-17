@@ -1,10 +1,14 @@
 import json
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from langchain_core.messages import SystemMessage, HumanMessage
-from langchain_ollama import ChatOllama
+try:
+    from langchain_ollama import ChatOllama
+except ImportError:
+    ChatOllama = None
 from langchain_openai import ChatOpenAI
 
 from app.config import get_settings
+from app.utils.errors import is_token_or_quota_error
 from app.utils.logger import get_logger
 
 logger = get_logger("agents.chat")
@@ -27,7 +31,7 @@ class ChatAgentService:
     @classmethod
     def _get_llm(cls):
         """Returns the LLM configured with temperature 0.5."""
-        if settings.LLM_PROVIDER == "orcarouter":
+        if settings.LLM_PROVIDER == "orcarouter" and ChatOllama is not None:
             # For local Ollama, use ChatOllama which supports num_ctx natively
             # to prevent DeepSeek 128k context allocation OOM
             return ChatOllama(
@@ -50,7 +54,7 @@ class ChatAgentService:
         )
 
     @classmethod
-    async def generate_ticker_summary(cls, ticker: str, events: List[Dict[str, Any]]) -> str:
+    async def generate_ticker_summary(cls, ticker: str, events: List[Dict[str, Any]]) -> Optional[str]:
         """Generates a dynamic WhatsApp summary for a specific ticker."""
         logger.info(f"Generating dynamic summary for {ticker} with {len(events)} events.")
         llm = cls._get_llm()
@@ -69,17 +73,25 @@ class ChatAgentService:
         try:
             res = await llm.ainvoke(prompt)
             content = res.content if isinstance(res.content, str) else str(res.content)
+            if is_token_or_quota_error(content):
+                logger.error(
+                    f"🛑 [TOKEN HABIS / LLM EXHAUSTED] Output LLM untuk {ticker} terindikasi token error. Pesan WhatsApp ditiadakan.",
+                    content=content,
+                )
+                return None
             return content.strip()
         except Exception as e:
-            logger.error(f"Failed to generate dynamic summary for {ticker}", error=str(e))
-            # Fallback
-            if events:
-                latest = events[0]
-                return f"⚠️ [Sistem Sibuk]\nEmiten: *${ticker.upper()}*\nEvent Terakhir: {latest.get('title', 'N/A')}\n\n_Mohon coba lagi nanti untuk analisis AI._"
-            return f"ℹ️ Belum ada aksi korporasi strategis atau Konglo Move yang tercatat untuk *${ticker.upper()}*."
+            if is_token_or_quota_error(e):
+                logger.error(
+                    f"🛑 [TOKEN HABIS / LLM EXHAUSTED] Kuota atau token LLM habis saat memproses ticker {ticker}. Pesan WhatsApp ditiadakan.",
+                    error=str(e),
+                )
+            else:
+                logger.error(f"Failed to generate dynamic summary for {ticker}", error=str(e))
+            return None
 
     @classmethod
-    async def generate_category_summary(cls, category_name: str, events: List[Dict[str, Any]]) -> str:
+    async def generate_category_summary(cls, category_name: str, events: List[Dict[str, Any]]) -> Optional[str]:
         """Generates a dynamic WhatsApp summary for a specific category (e.g. Konglo Move, Famous Stocks)."""
         logger.info(f"Generating dynamic category summary for {category_name} with {len(events)} events.")
         llm = cls._get_llm()
@@ -98,13 +110,19 @@ class ChatAgentService:
         try:
             res = await llm.ainvoke(prompt)
             content = res.content if isinstance(res.content, str) else str(res.content)
+            if is_token_or_quota_error(content):
+                logger.error(
+                    f"🛑 [TOKEN HABIS / LLM EXHAUSTED] Output LLM untuk kategori {category_name} terindikasi token error. Pesan WhatsApp ditiadakan.",
+                    content=content,
+                )
+                return None
             return content.strip()
         except Exception as e:
-            logger.error(f"Failed to generate dynamic category summary for {category_name}", error=str(e))
-            # Fallback
-            if events:
-                lines = [f"⚠️ [Sistem Sibuk] - Pergerakan *{category_name}* Terakhir:"]
-                for ev in events[:5]:
-                    lines.append(f"- *${ev.get('ticker')}*: {ev.get('title', 'N/A')}")
-                return "\n".join(lines)
-            return f"ℹ️ Saat ini belum ada pergerakan terbaru untuk kategori *{category_name}*."
+            if is_token_or_quota_error(e):
+                logger.error(
+                    f"🛑 [TOKEN HABIS / LLM EXHAUSTED] Kuota atau token LLM habis saat memproses kategori {category_name}. Pesan WhatsApp ditiadakan.",
+                    error=str(e),
+                )
+            else:
+                logger.error(f"Failed to generate dynamic category summary for {category_name}", error=str(e))
+            return None

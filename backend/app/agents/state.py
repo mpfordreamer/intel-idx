@@ -26,6 +26,10 @@ class AgentState(TypedDict, total=False):
 
     # Recommendation class output
     recommendation_class: str | None
+    multi_horizon: dict[str, str] | None
+    invalidation_triggers: list[str] | None
+    action_plan: str | None
+    dynamic_narrative: str | None
 
     # Formatted WA message
     wa_formatted_message: str | None

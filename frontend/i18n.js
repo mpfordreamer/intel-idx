@@ -2,7 +2,10 @@ const translations = {
     id: {
         // Navbar
         "nav.brand": "IDX-Intel AI",
-        "nav.badge": "MERAH PUTIH",
+        "nav.us_brand": "US-Intel AI",
+        "nav.sp500_brand": "US-Intel AI",
+        "nav.badge": "IHSG",
+        "nav.badge_us": "S&P 500 & NASDAQ",
         "nav.why": "Kenapa",
         "nav.features": "Fitur",
         "nav.pricing": "Harga",
@@ -11,8 +14,9 @@ const translations = {
         "nav.getStarted": "Gabung Sekarang",
 
         // Hero Section
+        "hero.badge": "🇮🇩 IDX INTELLIGENCE & 🇺🇸 WALL STREET S&P 500 / NASDAQ",
         "hero.title": "Bangun Sistem yang Mengubah Informasi Pasar Menjadi Keputusan Investasi yang Tepat.",
-        "hero.subtitle": "IDX-Intel AI memantau pergerakan pasar saham dan keterbukaan informasi BEI 24/7, menyaring ribuan berita, dan mengirimkan ringkasan penting langsung ke WhatsApp Anda.",
+        "hero.subtitle": "IDX-Intel AI & US-Intel AI memantau pergerakan pasar saham BEI, Wall Street (S&P 500 & NASDAQ), serta komoditas global 24/7 dan mengirimkan ringkasan penting langsung ke WhatsApp Anda.",
         "hero.btn.primary": "Gabung Sekarang (Gratis)",
         "hero.btn.secondary": "Coba Demo",
 
@@ -25,24 +29,24 @@ const translations = {
         "prob.5": "Terjebak dalam kebisingan grup dan rumor yang tidak berbasis data nyata.",
 
         // Filter / Qualification Section
-        "filter.title": "IDX-Intel AI bukan untuk semua orang.",
+        "filter.title": "IDX-Intel AI & US-Intel AI bukan untuk semua orang.",
         "filter.btn": "Gabung Komunitas Alert",
-        "filter.not.title": "IDX-Intel AI bukan untuk Anda jika:",
+        "filter.not.title": "Sistem ini bukan untuk Anda jika:",
         "filter.not.1": "Mencari sinyal beli instan tanpa analisa.",
         "filter.not.2": "Ingin cepat kaya dalam semalam.",
         "filter.not.3": "Tidak mau memahami data dan pergerakan pasar.",
-        "filter.yes.title": "IDX-Intel AI cocok jika Anda:",
-        "filter.yes.1": "Ingin memantau aktivitas saham dan pergerakan pasar secara objektif.",
+        "filter.yes.title": "Sistem ini cocok jika Anda:",
+        "filter.yes.1": "Ingin memantau aktivitas saham IDX dan Wall Street secara objektif.",
         "filter.yes.2": "Ingin mendapatkan ringkasan data penting dalam hitungan detik.",
         "filter.yes.3": "Serius membangun keputusan investasi berbasis data dan teknologi AI.",
 
         // Deliverables Section
         "deliv.badge": "FITUR UTAMA",
         "deliv.title": "Apa yang akan Anda dapatkan?",
-        "deliv.1.title": "Ringkasan Aktivitas Saham & Notifikasi WhatsApp (24/7)",
-        "deliv.1.desc": "Setiap kali ada pengumuman penting bursa atau aktivitas saham yang signifikan, sistem AI langsung merangkum intinya dan mengirimkannya ke WhatsApp Anda.",
-        "deliv.2.title": "Analisis Dokumen & Berita Saham Otomatis",
-        "deliv.2.desc": "AI membaca dan mengekstrak poin-poin krusial dari pengumuman pasar sehingga Anda tidak perlu membuang waktu membaca dokumen berpuluh-puluh halaman.",
+        "deliv.1.title": "🇮🇩 Saham Indonesia & Top 200 Konglomerat BEI (24/7)",
+        "deliv.1.desc": "Setiap kali ada pengumuman keterbukaan informasi BEI, Konglo Move, Crossing Jumbo, atau Backdoor Listing, AI langsung merangkum intinya ke WhatsApp Anda.",
+        "deliv.2.title": "🇺🇸 S&P 500, NASDAQ & Sektor Komoditas Global",
+        "deliv.2.desc": "Analisis rotasi sektor Wall Street, Semikonduktor, Big Tech NASDAQ, Perbankan AS, serta pergerakan komoditas strategis (Emas, Minyak, Timah, Tembaga).",
 
         // Authority Section
         "auth.badge": "DIBANGUN OLEH",
@@ -77,10 +81,12 @@ const translations = {
         // Closer Section
         "close.badge": "MULAI HARI INI",
         "close.title": "Bangun kebiasaan investasi Anda, perlahan tapi pasti.",
-        "close.btn": "Gabung IDX-Intel AI Sekarang",
+        "close.btn": "Gabung Komunitas Alert Sekarang",
 
         // Feed Section
-        "feed.title": "Live Corporate Action Feed",
+        "feed.title": "Live Intelligence Feed",
+        "feed.market.idx": "🇮🇩 Saham Indonesia (IDX)",
+        "feed.market.us": "🇺🇸 S&P 500 & NASDAQ (US)",
         "feed.filter.all": "Semua",
         "feed.filter.konglo": "👑 Konglomerat",
         "feed.filter.backdoor": "🚀 Backdoor",
@@ -92,6 +98,23 @@ const translations = {
         "card.status.analyzed": "Dianalisis",
         "card.status.filtered": "Disaring",
 
+        // Connect Page (Dual Group)
+        "connect.title": "Pilih Komunitas WhatsApp Intelijen Pasar",
+        "connect.desc": "Bergabunglah ke grup WhatsApp resmi untuk menerima notifikasi real-time dan analisis pasar 24/7.",
+        "connect.tab_idx": "🇮🇩 Saham Indonesia (IDX)",
+        "connect.tab_sp500": "🇺🇸 S&P 500 & NASDAQ (US)",
+        "connect.idx_card_title": "Grup WhatsApp IDX-Intel AI",
+        "connect.idx_card_desc": "Notifikasi keterbukaan informasi BEI, Konglo Move, Crossing Negosiasi, dan Aksi Korporasi IHSG.",
+        "connect.sp500_card_title": "Grup WhatsApp US-Intel AI",
+        "connect.sp500_card_desc": "Notifikasi pergerakan Wall Street, saham teknologi NASDAQ, rotasi sektor S&P 500, dan komoditas global.",
+        "connect.join_btn": "Buka WhatsApp & Gabung Grup",
+        "connect.loading": "Mengambil QR Code...",
+        "connect.instructions": "Cara menghubungkan:",
+        "connect.step1": "Buka aplikasi WhatsApp atau kamera/pemindai QR di HP Anda.",
+        "connect.step2": "Arahkan kamera untuk memindai QR Code di atas.",
+        "connect.step3": "Klik tautan yang muncul untuk membuka WhatsApp.",
+        "connect.step4": "Bergabunglah ke grup komunitas untuk menerima intelijen pasar otomatis.",
+
         // Action Section (Manual Trigger)
         "action.title": "⚡ Mulai Pemantauan Otomatis",
         "action.desc": "Klik tombol di bawah untuk mengumpulkan data terbaru dari berbagai sumber berita dan menganalisisnya secara otomatis menggunakan AI.",
@@ -101,7 +124,7 @@ const translations = {
         "action.success": "✅ Pipeline AI Selesai!",
 
         // Footer
-        "footer.tagline": "IDX-Intel AI · Platform Intelijen Pasar Saham Indonesia",
+        "footer.tagline": "IDX-Intel AI & US-Intel AI · Platform Intelijen Pasar Modal Indonesia & Global",
         "footer.copy": "© 2026 Ternak Automation. All rights reserved.",
 
         // Demo Terminal & WA
@@ -125,7 +148,10 @@ const translations = {
     en: {
         // Navbar
         "nav.brand": "IDX-Intel AI",
-        "nav.badge": "MERAH PUTIH",
+        "nav.us_brand": "US-Intel AI",
+        "nav.sp500_brand": "US-Intel AI",
+        "nav.badge": "IHSG",
+        "nav.badge_us": "S&P 500 & NASDAQ",
         "nav.why": "Why Us",
         "nav.features": "Features",
         "nav.pricing": "Pricing",
@@ -134,8 +160,9 @@ const translations = {
         "nav.getStarted": "Join Now",
 
         // Hero Section
+        "hero.badge": "🇮🇩 IDX INTELLIGENCE & 🇺🇸 WALL STREET S&P 500 / NASDAQ",
         "hero.title": "Build a System That Turns Market Information Into Smarter Investment Decisions.",
-        "hero.subtitle": "IDX-Intel AI monitors stock market movements and IDX announcements 24/7, filtering market noise and delivering key insights directly to your WhatsApp.",
+        "hero.subtitle": "IDX-Intel AI & US-Intel AI monitor IDX disclosures, Wall Street (S&P 500 & NASDAQ), and global commodities 24/7, sending intelligent summaries directly to your WhatsApp.",
         "hero.btn.primary": "Join Now (Free)",
         "hero.btn.secondary": "Try Demo",
 
@@ -148,28 +175,28 @@ const translations = {
         "prob.5": "Trapped in the noise of stock groups and rumors not backed by real data.",
 
         // Filter / Qualification Section
-        "filter.title": "IDX-Intel AI is not for everyone.",
+        "filter.title": "IDX-Intel AI & US-Intel AI is not for everyone.",
         "filter.btn": "Join Alert Community",
-        "filter.not.title": "IDX-Intel AI is not for you if you:",
+        "filter.not.title": "This system is not for you if you:",
         "filter.not.1": "Are looking for instant buy signals without analysis.",
         "filter.not.2": "Want to get rich quick overnight.",
         "filter.not.3": "Don't want to understand market data and movements.",
-        "filter.yes.title": "IDX-Intel AI is a fit for you if you:",
-        "filter.yes.1": "Want to monitor stock activities and market movements objectively.",
+        "filter.yes.title": "This system is a fit for you if you:",
+        "filter.yes.1": "Want to monitor IDX and Wall Street movements objectively.",
         "filter.yes.2": "Want to get important data summaries in seconds.",
         "filter.yes.3": "Are serious about building investment decisions based on data and AI technology.",
 
         // Deliverables Section
         "deliv.badge": "KEY FEATURES",
         "deliv.title": "What will you get?",
-        "deliv.1.title": "Stock Activity Summary & WhatsApp Alerts (24/7)",
-        "deliv.1.desc": "Whenever there are important exchange announcements or significant stock activities, the AI system immediately summarizes the core and sends it to your WhatsApp.",
-        "deliv.2.title": "Automated Document & News Analysis",
-        "deliv.2.desc": "AI reads and extracts crucial points from market announcements so you don't waste time reading dozens of pages manually.",
+        "deliv.1.title": "🇮🇩 Indonesia Equities & Top 200 Conglomerates (24/7)",
+        "deliv.1.desc": "Whenever there are official IDX announcements, Conglomerate Moves, Negotiated Crossings, or Backdoor Listings, AI summarizes the core into your WhatsApp.",
+        "deliv.2.title": "🇺🇸 S&P 500, NASDAQ & Global Commodities",
+        "deliv.2.desc": "Intelligence on Wall Street sector rotations, Semis, Big Tech NASDAQ, US Banks, and critical commodities (Gold, Crude Oil, Tin, Copper).",
 
         // Authority Section
         "auth.badge": "BUILT BY",
-        "auth.title": "Ternak AI & IDX Intelligence Lab",
+        "auth.title": "Ternak AI & Intelligence Lab",
         "auth.desc": "Built by capital market practitioners and AI engineers who understand the ins and outs of exchange disclosures. The system is designed to work automatically, structured, and accurately without data manipulation.",
 
         // Pricing Section
@@ -178,32 +205,34 @@ const translations = {
         "price.normal": "Rp 999.000",
         "price.free": "Rp 0",
         "price.free.tag": "(GRATIS / FREE)",
-        "price.check.1": "24/7 Monitoring of IDX Disclosures & Stock Activities",
+        "price.check.1": "24/7 Monitoring of IDX & Wall Street Disclosures",
         "price.check.2": "Real-time notifications via WhatsApp direct to your phone",
-        "price.check.3": "Smart analysis of stock activities and capital market movements",
+        "price.check.3": "Smart analysis of stock activities and sector movements",
         "price.check.4": "Interactive Q&A access to AI Customer Service regarding the market",
         "price.btn": "Register & Join WhatsApp Free",
 
         // FAQ Section
         "faq.title": "FAQ",
-        "faq.q1": "Is IDX-Intel AI a paid service?",
-        "faq.a1": "No. Currently, access is 100% FREE (from a normal value of Rp 999.000). You can join our WhatsApp group right away.",
-        "faq.q2": "Is this a stock signal group?",
-        "faq.a2": "No. IDX-Intel AI is a data monitoring and exchange information filtering system, helping you get facts faster and objectively.",
+        "faq.q1": "Are these alert services paid?",
+        "faq.a1": "No. Currently, access is 100% FREE (from a normal value of Rp 999.000). You can join our WhatsApp groups right away.",
+        "faq.q2": "Are these stock signal groups?",
+        "faq.a2": "No. IDX-Intel AI & US-Intel AI are data monitoring and filtering platforms, helping you get facts faster and objectively.",
         "faq.q3": "Where is the data sourced from?",
-        "faq.a3": "The system monitors official Indonesia Stock Exchange (IDX) announcements and trusted financial media in real-time.",
+        "faq.a3": "The system monitors official Indonesia Stock Exchange (IDX) announcements, Wall Street indices, and trusted global financial media in real-time.",
         "faq.q4": "How do I join?",
-        "faq.a4": "Simply click the Join Now button, scan the QR Code, or use the provided WhatsApp group invitation link.",
+        "faq.a4": "Simply click the Join Now button, scan the QR Code, or use the provided WhatsApp group invitation links.",
         "faq.q5": "Can I ask the AI questions?",
         "faq.a5": "Yes, you can interact through the chat button in the bottom right corner to ask questions about exchange information.",
 
         // Closer Section
         "close.badge": "START TODAY",
         "close.title": "Build your data-driven investment habits, slowly but surely.",
-        "close.btn": "Join IDX-Intel AI Now",
+        "close.btn": "Join Alert Community Now",
 
         // Feed Section
-        "feed.title": "Live Corporate Action Feed",
+        "feed.title": "Live Intelligence Feed",
+        "feed.market.idx": "🇮🇩 Indonesia Equities (IDX)",
+        "feed.market.us": "🇺🇸 S&P 500 & NASDAQ (US)",
         "feed.filter.all": "All",
         "feed.filter.konglo": "👑 Conglomerates",
         "feed.filter.backdoor": "🚀 Backdoor",
@@ -215,6 +244,23 @@ const translations = {
         "card.status.analyzed": "Analyzed",
         "card.status.filtered": "Filtered",
 
+        // Connect Page (Dual Group)
+        "connect.title": "Select WhatsApp Market Intelligence Group",
+        "connect.desc": "Join our official WhatsApp communities to receive real-time notifications and market analysis 24/7.",
+        "connect.tab_idx": "🇮🇩 Indonesia Equities (IDX)",
+        "connect.tab_sp500": "🇺🇸 S&P 500 & NASDAQ (US)",
+        "connect.idx_card_title": "IDX-Intel AI WhatsApp Group",
+        "connect.idx_card_desc": "Notifications for IDX official disclosures, Top 200 Conglomerates, Negotiated Crossings, and Corporate Actions.",
+        "connect.sp500_card_title": "US-Intel AI WhatsApp Group",
+        "connect.sp500_card_desc": "Notifications for Wall Street movements, NASDAQ tech stocks, S&P 500 sector rotations, and global commodities.",
+        "connect.join_btn": "Open WhatsApp & Join Group",
+        "connect.loading": "Fetching QR Code...",
+        "connect.instructions": "How to join:",
+        "connect.step1": "Open WhatsApp or a QR scanner on your phone.",
+        "connect.step2": "Point your camera to scan the QR Code above.",
+        "connect.step3": "Tap the link that appears to open WhatsApp.",
+        "connect.step4": "Join the community group to receive automated market intelligence.",
+
         // Action Section (Manual Trigger)
         "action.title": "⚡ Start Automated Monitoring",
         "action.desc": "Click the button below to collect the latest data from various news sources and analyze it automatically using AI.",
@@ -224,7 +270,7 @@ const translations = {
         "action.success": "✅ AI Pipeline Completed!",
 
         // Footer
-        "footer.tagline": "IDX-Intel AI · Indonesia Stock Market Intelligence Platform",
+        "footer.tagline": "IDX-Intel AI & US-Intel AI · Platform for Indonesian & Global Market Intelligence",
         "footer.copy": "© 2026 Ternak Automation. All rights reserved.",
 
         // Demo Terminal & WA
@@ -260,7 +306,7 @@ function applyTranslations() {
             }
         }
     });
-    
+
     const langBtn = document.getElementById('langToggle');
     if (langBtn) {
         langBtn.innerHTML = currentLang === 'id' ? 'ID' : 'EN';
@@ -275,7 +321,7 @@ function toggleLanguage() {
     currentLang = currentLang === 'id' ? 'en' : 'id';
     localStorage.setItem('idx_lang', currentLang);
     applyTranslations();
-    
+
     if (typeof liveAiData !== 'undefined' && liveAiData.length > 0 && typeof renderCards === 'function') {
         renderCards(liveAiData);
     }

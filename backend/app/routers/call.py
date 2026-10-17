@@ -34,7 +34,7 @@ async def call_ticker(ticker: str):
         })
         
     summary = await ChatAgentService.generate_ticker_summary(ticker, events_data)
-    return QueryResponse(message=summary)
+    return QueryResponse(message=summary or "")
 
 
 @router.get("/category/{category_name}", response_model=QueryResponse)
@@ -58,7 +58,7 @@ async def call_category(category_name: str):
         })
         
     summary = await ChatAgentService.generate_category_summary(category_name, events_data)
-    return QueryResponse(message=summary)
+    return QueryResponse(message=summary or "")
 
 
 @router.post("/famous", response_model=QueryResponse)
@@ -82,4 +82,4 @@ async def call_famous(tickers: List[str]):
         })
         
     summary = await ChatAgentService.generate_category_summary("Famous Stocks", events_data)
-    return QueryResponse(message=summary)
+    return QueryResponse(message=summary or "")

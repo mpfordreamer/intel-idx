@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     Centralized Application Configuration loaded from environment variables or .env file.
     Uses Pydantic v2 BaseSettings for type-safe validation.
     """
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(env_file=(".env", "../.env"), env_file_encoding="utf-8", extra="ignore")
 
     # Application Meta
     ENVIRONMENT: str = Field(default="development", description="Run environment (development/staging/production)")
@@ -38,6 +38,8 @@ class Settings(BaseSettings):
     WAHA_SESSION_ID: str = Field(default="default", description="WAHA WhatsApp session ID")
     WAHA_WEBHOOK_SECRET: str = Field(description="Webhook authentication secret")
     BROADCAST_CHAT_ID: str = Field(description="Target WhatsApp Group ID for alerts")
+    BROADCAST_CHAT_ID_SP500: str | None = Field(default="120363433329604841@g.us", description="Target WhatsApp Group ID for S&P 500 & Global alerts")
+    BROADCAST_CHAT_ID_TERNAK_NEWS: str | None = Field(default="120363410893963015@g.us", description="Target WhatsApp Group ID for Global Macro & Ternak Saham News")
     ALWAYS_NOTIFY_WA: bool = Field(default=False, description="Send all events to WA regardless of category for testing")
 
     # Scheduler & Throttling

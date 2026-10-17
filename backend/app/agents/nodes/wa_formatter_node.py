@@ -1,6 +1,7 @@
 from app.agents.state import AgentState
 from app.repositories.event_repository import EventRepository
 from app.services.prompt import format_wa_alert_message
+from app.services.sector_mapping import SP500_TAXONOMY
 from app.utils.db_session import async_session_factory
 from app.utils.logger import get_logger
 
@@ -19,6 +20,16 @@ async def wa_formatter_node(state: AgentState) -> dict:
     extracted = state.get("extracted_data")
     impact = state.get("impact_analysis")
     rec_class = state.get("recommendation_class")
+    multi_horizon = state.get("multi_horizon")
+    invalidation_triggers = state.get("invalidation_triggers")
+    action_plan = state.get("action_plan")
+    dynamic_narrative = state.get("dynamic_narrative")
+
+    us_tickers = {t for info in SP500_TAXONOMY.values() for t in info.get("tickers", [])}
+    is_us = (
+        doc.source_name in ("TRADINGVIEW_REALTIME", "YAHOO_FINANCE", "YAHOO_FINANCE_US")
+        or doc.ticker.upper() in us_tickers
+    )
 
     wa_msg = format_wa_alert_message(
         ticker=doc.ticker,
@@ -29,6 +40,11 @@ async def wa_formatter_node(state: AgentState) -> dict:
         recommendation_class=rec_class,
         source_url=doc.source_url,
         raw_text=doc.raw_text,
+        multi_horizon=multi_horizon,
+        invalidation_triggers=invalidation_triggers,
+        action_plan=action_plan,
+        dynamic_narrative=dynamic_narrative,
+        is_us=is_us,
     )
 
     saved_id = None

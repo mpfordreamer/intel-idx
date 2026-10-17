@@ -7,25 +7,31 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>IDX-Intel AI — Corporate Action Intelligence & WhatsApp Bot (Merah Putih Edition)</title>
+    <title>IDX-Intel AI & US-Intel AI — Indonesia (IDX) & Wall Street (S&P 500 & NASDAQ) Market Intelligence</title>
     <meta name="description"
-        content="Autonomous AI Agent for IDX Corporate Action Intelligence, 3-Category Classification, Top 200 Konglomerat Tracking, and Real-time WhatsApp Alerting.">
+        content="Autonomous AI Agents for Indonesia (BEI) Corporate Actions, Top 200 Konglomerat Tracking, and Wall Street (S&P 500 & NASDAQ) Sector Intelligence with Real-time WhatsApp Alerting.">
     <!-- Google Fonts: Outfit & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./style.css?v=3.0">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
 <body>
     <!-- NAVBAR -->
     <header class="navbar">
-        <a href="./" class="logo">
-            <span data-i18n="nav.brand">IDX-Intel AI</span>
-            <span class="logo-badge" data-i18n="nav.badge">MERAH PUTIH</span>
+        <a href="./" class="logo logo-stacked">
+            <div class="logo-row-main">
+                <span data-i18n="nav.brand">IDX-Intel AI</span>
+                <span class="logo-badge" data-i18n="nav.badge">IHSG</span>
+            </div>
+            <div class="logo-row-sub">
+                <span data-i18n="nav.us_brand">US-Intel AI</span>
+                <span class="logo-badge-us" data-i18n="nav.badge_us">S&P 500 & NASDAQ</span>
+            </div>
         </a>
         <nav class="nav-links">
             <button id="langToggle" class="nav-link"
@@ -38,13 +44,13 @@
     <!-- HERO SECTION -->
     <section class="hero" id="hero">
         <div class="patriot-ribbon">
-            <span>🇮🇩 INDONESIA CAPITAL MARKET INTELLIGENCE — SMART MONEY ACCUMULATION</span>
+            <span data-i18n="hero.badge">🇮🇩 IDX INTELLIGENCE & 🇺🇸 WALL STREET S&P 500 / NASDAQ</span>
         </div>
         <h1 data-i18n="hero.title">Bangun Sistem yang Mengubah Informasi Pasar Menjadi Keputusan Investasi yang Tepat.
         </h1>
         <p data-i18n="hero.subtitle">
-            IDX-Intel AI memantau pergerakan pasar saham dan keterbukaan informasi BEI 24/7, menyaring ribuan berita,
-            dan mengirimkan ringkasan penting langsung ke WhatsApp Anda.
+            IDX-Intel AI & US-Intel AI memantau pergerakan pasar saham BEI, Wall Street (S&P 500 & NASDAQ), serta
+            komoditas global 24/7 dan mengirimkan ringkasan penting langsung ke WhatsApp Anda.
         </p>
         <div class="hero-actions">
             <a href="connect" class="btn-patriot" data-i18n="hero.btn.primary">Gabung Sekarang</a>
@@ -221,18 +227,27 @@
     <section class="closer-section" id="closer">
         <div class="section-badge" data-i18n="close.badge">MULAI HARI INI</div>
         <h2 class="section-title" data-i18n="close.title">Bangun kebiasaan investasi Anda, perlahan tapi pasti.</h2>
-        <a href="connect" class="btn-patriot" data-i18n="close.btn">Gabung IDX-Intel AI Sekarang</a>
+        <a href="connect" class="btn-patriot" data-i18n="close.btn">Gabung Komunitas Alert Sekarang</a>
     </section>
 
     <!-- MAIN DASHBOARD GRID (FEED) -->
     <main class="dashboard-grid demo-hidden" id="demoMain">
         <!-- LEFT COLUMN: LIVE CORPORATE ACTION CARDS -->
         <section class="feed-section" id="feed">
+            <div class="market-switcher">
+                <button class="market-tab-btn active idx-active" id="tabIdx" onclick="switchMarketFeed('IDX')">
+                    <span data-i18n="feed.market.idx">🇮🇩 Saham Indonesia (IDX)</span>
+                </button>
+                <button class="market-tab-btn sp500-active" id="tabSp500" onclick="switchMarketFeed('US')">
+                    <span data-i18n="feed.market.us">🇺🇸 S&P 500 & NASDAQ (US)</span>
+                </button>
+            </div>
+
             <div class="section-header">
                 <h2 class="section-title">
-                    <span data-i18n="feed.title">Live Corporate Action Feed</span>
+                    <span data-i18n="feed.title">Live Intelligence Feed</span>
                 </h2>
-                <div class="filter-buttons">
+                <div class="filter-buttons" id="idxFilterButtons">
                     <button class="filter-btn active" onclick="filterCards('ALL')"
                         data-i18n="feed.filter.all">Semua</button>
                     <button class="filter-btn" onclick="filterCards('KONGLO_MOVE')" data-i18n="feed.filter.konglo">👑
@@ -309,7 +324,7 @@
     </button>
 
     <!-- INTERACTIVE JAVASCRIPT LOGIC -->
-    <script src="./i18n.js"></script>
+    <script src="./i18n.js?v=3.0"></script>
     <script>
         let liveAiData = [];
 
@@ -488,6 +503,116 @@
                         <div class="meta-item" style="text-align: right;">
                             <span class="meta-label">${statusLabel}</span>
                             <span class="meta-value">${statusText}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(article);
+            });
+        }
+
+        let currentMarket = 'IDX';
+
+        const sampleUsSectorData = [
+            {
+                ticker: 'NVDA, TSM, AMD',
+                category: 'S&P 500 & NASDAQ',
+                sector_name: 'US Semiconductors & AI Hardware',
+                stance: 'OVERWEIGHT',
+                score: '+0.88',
+                analysis: 'Permintaan akselerator komputasi dan pusat data AI skala global terus mencatat lonjakan pesanan. Margin operasional produsen foundry dan desainer chip utama tetap ekspansif.',
+                top_picks: '$NVDA, $TSM, $AMD, $AVGO',
+                source: 'TradingView / Yahoo Finance'
+            },
+            {
+                ticker: 'MSFT, AAPL, GOOGL',
+                category: 'NASDAQ BIG TECH',
+                sector_name: 'Mega Tech & Enterprise Cloud',
+                stance: 'OVERWEIGHT',
+                score: '+0.82',
+                analysis: 'Adopsi solusi AI generatif pada platform enterprise cloud mendongkrak pendapatan berulang (recurring revenue). Neraca kas yang tebal memberikan daya tahan tinggi terhadap suku bunga The Fed.',
+                top_picks: '$MSFT, $AAPL, $GOOGL, $META',
+                source: 'CNBC US Markets'
+            },
+            {
+                ticker: 'XAUUSD, ANTM, MDKA',
+                category: 'GLOBAL COMMODITY',
+                sector_name: 'Logam Mulia (Gold & Silver)',
+                stance: 'OVERWEIGHT',
+                score: '+0.79',
+                analysis: 'Sentimen safe haven dan akumulasi cadangan devisa oleh bank sentral global mendorong harga emas dunia menguji rekor tertinggi baru. Korelasi positif langsung menguntungkan produsen emas.',
+                top_picks: '$XAUUSD, $ANTM, $MDKA, $BRMS',
+                source: 'TradingView Global Macro'
+            },
+            {
+                ticker: 'TINS, INCO, AMMN',
+                category: 'METALS & MINING',
+                sector_name: 'Timah, Tembaga & Mineral Strategis',
+                stance: 'ACCUMULATE_ON_WEAKNESS',
+                score: '+0.75',
+                analysis: 'Ketegangan pasokan timah LME dan percepatan hilirisasi tembaga/nikel menciptakan peluang akumulasi saat harga konsolidasi jangka pendek.',
+                top_picks: '$TINS, $AMMN, $MDKA, $INCO',
+                source: 'LME & Commodity Desk'
+            }
+        ];
+
+        function switchMarketFeed(market) {
+            currentMarket = market;
+            const tabIdx = document.getElementById('tabIdx');
+            const tabSp500 = document.getElementById('tabSp500');
+            const idxFilterButtons = document.getElementById('idxFilterButtons');
+
+            if (market === 'IDX') {
+                tabIdx.classList.add('active');
+                tabSp500.classList.remove('active');
+                if (idxFilterButtons) idxFilterButtons.style.display = 'flex';
+                renderCards(liveAiData);
+            } else {
+                tabSp500.classList.add('active');
+                tabIdx.classList.remove('active');
+                if (idxFilterButtons) idxFilterButtons.style.display = 'none';
+                renderUsCards(sampleUsSectorData);
+            }
+        }
+
+        function renderUsCards(items) {
+            const container = document.getElementById('feed-container');
+            container.innerHTML = '';
+
+            items.forEach(item => {
+                const article = document.createElement('article');
+                article.className = 'event-card';
+                article.setAttribute('data-category', 'US_MARKET');
+
+                const recomClass = item.stance === 'OVERWEIGHT' ? 'recom-strong' : 'recom-buy';
+                const recomHtml = `<span class="recom-badge ${recomClass}">⚡ ${item.stance} (${item.score})</span>`;
+
+                article.innerHTML = `
+                    <div class="card-top">
+                        <div class="ticker-badge">
+                            <span>${item.ticker}</span>
+                            <span class="category-badge category-backdoor" style="background: linear-gradient(135deg, #1D4ED8, #2563EB);">${item.category}</span>
+                        </div>
+                        ${recomHtml}
+                    </div>
+                    <h3 class="event-title">${item.sector_name}</h3>
+                    <div class="event-impact">
+                        <b>Analisis Sektor:</b> ${item.analysis}
+                    </div>
+                    <div style="margin-top: 0.75rem; font-size: 0.85rem; color: #38bdf8;">
+                        <b>Top Picks:</b> ${item.top_picks}
+                    </div>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Sumber</span>
+                            <span class="meta-value">${item.source}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Sesi</span>
+                            <span class="meta-value">Wall Street & Commodities</span>
+                        </div>
+                        <div class="meta-item" style="text-align: right;">
+                            <span class="meta-label">Status</span>
+                            <span class="meta-value" style="color: #34d399;">Active Intelligence</span>
                         </div>
                     </div>
                 `;

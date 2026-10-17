@@ -3,10 +3,12 @@ services:
     image: postgres:16-alpine
     container_name: idx_intel_postgres
     restart: always
+    env_file:
+      - .dockerenv
     environment:
-      POSTGRES_USER: idx_intel
-      POSTGRES_PASSWORD: password123.
-      POSTGRES_DB: idx_intel_db
+      POSTGRES_USER: ${POSTGRES_USER:-idx_intel}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Parawangsa02.}
+      POSTGRES_DB: ${POSTGRES_DB:-idx_intel_db}
     ports:
       - "5432:5432"
     volumes:
@@ -62,6 +64,9 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
     env_file:
       - .dockerenv
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     ports:
       - "8045:8002"
     depends_on:
@@ -75,7 +80,6 @@ services:
 
 volumes:
   postgres_data:
-  qdrant_data:
   redis_data:
   waha_data:
   waha_sessions:

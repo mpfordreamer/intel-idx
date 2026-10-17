@@ -37,6 +37,7 @@ ENV/
 .pytest_cache/
 .coverage
 htmlcov/
+backend/tests/
 
 # Logs & Debug
 *.log

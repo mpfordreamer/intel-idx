@@ -2,6 +2,7 @@ import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential
 from app.config import get_settings
 from app.schemas.waha_schema import WAHASendTextRequest
+from app.utils.errors import is_token_or_quota_error
 from app.utils.logger import get_logger
 
 logger = get_logger("services.waha")
@@ -26,7 +27,19 @@ class WAHAClient:
     async def send_text(self, chat_id: str, text: str) -> bool:
         """
         Sends an outbound text message to a WhatsApp chat or phone number via WAHA.
+        Intercepts and suppresses any token/quota error messages.
         """
+        if not text or not text.strip():
+            logger.info("Empty message suppressed from WAHA dispatch", chat_id=chat_id)
+            return False
+
+        if is_token_or_quota_error(text):
+            logger.warning(
+                "🛑 [SUPPRESSED WAHA MESSAGE] Pengiriman WhatsApp dibatalkan karena mengandung pesan token/kuota error.",
+                chat_id=chat_id,
+                snippet=text[:100],
+            )
+            return False
         payload = WAHASendTextRequest(
             chatId=chat_id if "@" in chat_id else f"{chat_id}@c.us",
             text=text,

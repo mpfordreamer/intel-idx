@@ -1,12 +1,12 @@
 # Panduan Setup Docker & Eksekusi IDX-Intel AI
 
-Berikut adalah panduan langkah demi langkah untuk menjalankan [docker-compose.yml](file:///c:/Users/dewam/Dokumen/Project%20AI%20and%20Website/Ternak%20AI/Invest-Automation/docker-compose.yml), menerapkan migrasi database (Alembic), menjalankan server backend **IDX-Intel AI**, dan menghubungkan WhatsApp melalui WAHA.
+Berikut adalah panduan langkah demi langkah untuk menjalankan [docker-compose.yml](file:///c:/Users/dewam/Dokumen/Project%20AI%20and%20Website/Ternak-AI/Invest-Automation/docker-compose.yml), menerapkan migrasi database (Alembic), menjalankan server backend **IDX-Intel AI**, dan menghubungkan WhatsApp melalui WAHA.
 
 ---
 
 ## Prasyarat (.env)
-- Anda **tidak wajib** mengisi `.env` untuk menjalankan container Docker karena kredensial sudah diatur mandiri di [docker-compose.yml](file:///c:/Users/dewam/Dokumen/Project%20AI%20and%20Website/Ternak%20AI/Invest-Automation/docker-compose.yml).
-- File [.env](file:///c:/Users/dewam/Dokumen/Project%20AI%20and%20Website/Ternak%20AI/Invest-Automation/.env) baru dibutuhkan saat menjalankan migrasi dan server FastAPI. Kredensial default untuk database dan Redis sudah disesuaikan (`password123.`).
+- Anda **tidak wajib** mengisi `.env` untuk menjalankan container Docker karena kredensial sudah diatur mandiri di [docker-compose.yml](file:///c:/Users/dewam/Dokumen/Project%20AI%20and%20Website/Ternak-AI/Invest-Automation/docker-compose.yml).
+- File [.env](file:///c:/Users/dewam/Dokumen/Project%20AI%20and%20Website/Ternak-AI/Invest-Automation/.env) baru dibutuhkan saat menjalankan migrasi dan server FastAPI. Kredensial default untuk database dan Redis sudah disesuaikan (`password123.`).
 - Anda hanya perlu mengisi `OPENAI_API_KEY=sk-xxx` di dalam `.env` apabila ingin menggunakan analisis LLM aktif (jika kosong, sistem tetap berjalan menggunakan *rule-based fallback*).
 
 ---
