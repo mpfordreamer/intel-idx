@@ -1591,6 +1591,13 @@
                 padding: 0.2rem 0.3rem !important;
             }
 
+            a[data-i18n="nav.back"],
+            .nav-link[data-i18n="nav.back"],
+            .nav-links a[data-i18n="nav.back"],
+            .nav-link-back {
+                display: none !important;
+            }
+
             .navbar .btn-patriot {
                 padding: 0.35rem 0.75rem !important;
                 font-size: 0.75rem !important;
@@ -1598,6 +1605,15 @@
                 border-radius: 6px !important;
                 font-weight: 700 !important;
                 letter-spacing: -0.2px !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            a[data-i18n="nav.back"],
+            .nav-link[data-i18n="nav.back"],
+            .nav-links a[data-i18n="nav.back"],
+            .nav-link-back {
+                display: none !important;
             }
         }
 

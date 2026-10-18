@@ -11,6 +11,7 @@ const translations = {
         "nav.pricing": "Harga",
         "nav.faq": "FAQ",
         "nav.demo": "Demo",
+        "nav.back": "Kembali ke Dashboard",
         "nav.getStarted": "Gabung Sekarang",
 
         // Hero Section
@@ -161,6 +162,7 @@ const translations = {
         "nav.pricing": "Pricing",
         "nav.faq": "FAQ",
         "nav.demo": "Demo",
+        "nav.back": "Back to Dashboard",
         "nav.getStarted": "Join Now",
 
         // Hero Section
