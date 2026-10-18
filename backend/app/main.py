@@ -160,11 +160,25 @@ def create_app() -> FastAPI:
         fav = FRONTEND_DIR / "favicon.ico"
         if fav.exists():
             return FileResponse(fav, headers=NO_CACHE_HEADERS)
-        return JSONResponse(status_code=204, content={})
+        svg_favicon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">💸</text></svg>'
+        from fastapi.responses import Response
+        return Response(content=svg_favicon, media_type="image/svg+xml", headers=NO_CACHE_HEADERS)
 
-    # Mount static files (CSS, JS)
+    ASSETS_DIR = FRONTEND_DIR / "assets"
+
+    @application.get("/assets/{asset_name:path}", summary="Serve Frontend Assets Direct")
+    @application.get("/{prefix}/assets/{asset_name:path}", summary="Serve Frontend Assets with Prefix Fallback")
+    async def serve_asset_file(asset_name: str, prefix: str = ""):
+        file_path = FRONTEND_DIR / "assets" / asset_name
+        if file_path.exists():
+            return FileResponse(file_path, headers=NO_CACHE_HEADERS)
+        return JSONResponse(status_code=404, content={"detail": f"Asset {asset_name} not found"})
+
+    # Mount static files (CSS, JS, Assets)
     if FRONTEND_DIR.exists():
         from fastapi.staticfiles import StaticFiles
+        if ASSETS_DIR.exists():
+            application.mount("/assets", StaticFiles(directory=str(ASSETS_DIR)), name="assets")
         application.mount("/frontend", StaticFiles(directory=str(FRONTEND_DIR)), name="frontend")
     else:
         print(f"WARNING: Frontend directory not found at {FRONTEND_DIR}")

@@ -13,8 +13,10 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap"
         rel="stylesheet">
 
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💸</text></svg>">
     <!-- Shared Styles -->
-    <link rel="stylesheet" href="./style.css?v=3.0">
+    <link rel="stylesheet" href="./style.css?v=3.3">
+    <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1"></script>
 
     <style>
         .connect-wrapper {
@@ -129,80 +131,46 @@
             Bergabunglah ke grup WhatsApp resmi untuk menerima notifikasi real-time dan analisis pasar 24/7.
         </p>
 
-        <div class="dual-connect-grid">
-            <!-- CARD 1: IDX-INTEL AI -->
-            <div class="connect-card-dual idx-card">
-                <div>
-                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🇮🇩</div>
-                    <h3 style="font-size: 1.4rem; color: #fff; margin-bottom: 0.5rem;"
-                        data-i18n="connect.idx_card_title">Grup WhatsApp IDX-Intel AI</h3>
-                    <p style="color: var(--text-sub); font-size: 0.9rem;" data-i18n="connect.idx_card_desc">
-                        Notifikasi keterbukaan informasi BEI, Konglo Move, Crossing Negosiasi, dan Aksi Korporasi IHSG.
-                    </p>
-
-                    <div class="qr-placeholder" id="qrContainerIdx">
-                        <div class="qr-loading-overlay" id="qrLoaderIdx">
-                            <div class="spinner"></div>
-                            <span data-i18n="connect.loading">Mengambil QR Code...</span>
-                        </div>
-                        <img src="" alt="QR Code IDX" id="qrImageIdx" style="display:none;">
+        <div class="single-connect-card">
+            <div>
+                <div class="card-title-stacked">
+                    <div class="card-title-row-main">
+                        <span>IDX-Intel AI</span>
+                        <span class="logo-badge">IHSG</span>
                     </div>
+                    <div class="card-title-row-sub">
+                        <span>US-Intel AI</span>
+                        <span class="logo-badge-us">S&P 500 & NASDAQ</span>
+                    </div>
+                </div>
+                <h3 class="card-community-subtitle" data-i18n="connect.single_card_title">Komunitas WhatsApp Resmi</h3>
+                <p style="color: var(--text-sub); font-size: 0.95rem; line-height: 1.6; max-width: 480px; margin: 0 auto 1.5rem;" data-i18n="connect.single_card_desc">
+                    Dapatkan update langsung sinyal beli/hold konglomerat BEI, radar crossing jumbo, rotasi sektor Wall Street, dan analisis pergerakan komoditas dunia 24/7.
+                </p>
 
-                    <a href="https://chat.whatsapp.com/CJVb20tuP5XLipAsG0xHib?s=cl&p=a&mlu=4" target="_blank"
-                        rel="noopener noreferrer" class="btn-patriot"
-                        style="width: 100%; display: block; margin-top: 1rem;" data-i18n="connect.join_btn">
-                        Buka WhatsApp & Gabung Grup
-                    </a>
+                <div class="qr-placeholder" id="qrContainer" style="width: 250px; height: 250px;">
+                    <div class="qr-loading-overlay" id="qrLoader">
+                        <div class="spinner"></div>
+                        <span data-i18n="connect.loading">Mengambil QR Code...</span>
+                    </div>
+                    <img src="" alt="QR Code WhatsApp Community" id="qrImage" style="display:none; width: 100%; height: 100%;">
                 </div>
 
-                <div class="steps">
-                    <strong data-i18n="connect.instructions">Cara menghubungkan:</strong>
-                    <ol>
-                        <li data-i18n="connect.step1">Buka aplikasi WhatsApp atau kamera/pemindai QR di HP Anda.</li>
-                        <li data-i18n="connect.step2">Arahkan kamera untuk memindai QR Code di atas.</li>
-                        <li data-i18n="connect.step3">Klik tautan yang muncul untuk membuka WhatsApp.</li>
-                        <li data-i18n="connect.step4">Bergabunglah ke grup komunitas untuk menerima intelijen pasar
-                            otomatis.</li>
-                    </ol>
-                </div>
+                <a href="https://chat.whatsapp.com/LZ2kM8bZDSECbBnO2gZa4H" target="_blank"
+                    rel="noopener noreferrer" class="btn-community-join" data-i18n="connect.join_btn">
+                    <i class="ph ph-whatsapp-logo" style="font-size: 1.3rem;"></i>
+                    <span>Buka WhatsApp & Gabung Komunitas</span>
+                </a>
             </div>
 
-            <!-- CARD 2: S&P500-INTEL AI -->
-            <div class="connect-card-dual sp500-card">
-                <div>
-                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🇺🇸</div>
-                    <h3 style="font-size: 1.4rem; color: #fff; margin-bottom: 0.5rem;"
-                        data-i18n="connect.sp500_card_title">Grup WhatsApp US-Intel AI</h3>
-                    <p style="color: var(--text-sub); font-size: 0.9rem;" data-i18n="connect.sp500_card_desc">
-                        Notifikasi pergerakan Wall Street, saham teknologi NASDAQ, rotasi sektor S&P 500, dan komoditas
-                        global.
-                    </p>
-
-                    <div class="qr-placeholder" id="qrContainerSp500">
-                        <div class="qr-loading-overlay" id="qrLoaderSp500">
-                            <div class="spinner spinner-blue"></div>
-                            <span data-i18n="connect.loading">Mengambil QR Code...</span>
-                        </div>
-                        <img src="" alt="QR Code S&P 500" id="qrImageSp500" style="display:none;">
-                    </div>
-
-                    <a href="https://chat.whatsapp.com/CJVb20tuP5XLipAsG0xHib?s=cl&p=a&mlu=4" target="_blank"
-                        rel="noopener noreferrer" class="btn-sp500"
-                        style="width: 100%; display: block; margin-top: 1rem;" data-i18n="connect.join_btn">
-                        Buka WhatsApp & Gabung Grup
-                    </a>
-                </div>
-
-                <div class="steps">
-                    <strong data-i18n="connect.instructions">Cara menghubungkan:</strong>
-                    <ol>
-                        <li data-i18n="connect.step1">Buka aplikasi WhatsApp atau kamera/pemindai QR di HP Anda.</li>
-                        <li data-i18n="connect.step2">Arahkan kamera untuk memindai QR Code di atas.</li>
-                        <li data-i18n="connect.step3">Klik tautan yang muncul untuk membuka WhatsApp.</li>
-                        <li data-i18n="connect.step4">Bergabunglah ke grup komunitas untuk menerima intelijen pasar
-                            otomatis.</li>
-                    </ol>
-                </div>
+            <div class="steps" style="margin-top: 2rem;">
+                <strong data-i18n="connect.instructions">Cara menghubungkan:</strong>
+                <ol>
+                    <li data-i18n="connect.step1">Buka aplikasi WhatsApp atau kamera/pemindai QR di HP Anda.</li>
+                    <li data-i18n="connect.step2">Arahkan kamera untuk memindai QR Code di atas (atau klik tombol jika membuka via HP).</li>
+                    <li data-i18n="connect.step3">Klik tautan yang muncul untuk membuka WhatsApp.</li>
+                    <li data-i18n="connect.step4">Bergabunglah ke grup komunitas resmi untuk menerima intelijen pasar otomatis.</li>
+                </ol>
             </div>
         </div>
     </main>
@@ -215,28 +183,19 @@
     </footer>
 
     <!-- i18n logic extension -->
-    <script src="./i18n.js?v=3.0"></script>
+    <script src="./i18n.js?v=3.1"></script>
     <script>
-        // Load QR Codes dynamically
+        // Load QR Code dynamically for the official community
         setTimeout(() => {
-            const qrLoaderIdx = document.getElementById('qrLoaderIdx');
-            const qrImageIdx = document.getElementById('qrImageIdx');
-            if (qrLoaderIdx && qrImageIdx) {
-                qrLoaderIdx.style.display = 'none';
-                const waLinkIdx = encodeURIComponent("https://chat.whatsapp.com/CJVb20tuP5XLipAsG0xHib?s=cl&p=a&mlu=4");
-                qrImageIdx.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${waLinkIdx}`;
-                qrImageIdx.style.display = 'block';
+            const qrLoader = document.getElementById('qrLoader');
+            const qrImage = document.getElementById('qrImage');
+            if (qrLoader && qrImage) {
+                qrLoader.style.display = 'none';
+                const waLink = encodeURIComponent("https://chat.whatsapp.com/LZ2kM8bZDSECbBnO2gZa4H");
+                qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${waLink}`;
+                qrImage.style.display = 'block';
             }
-
-            const qrLoaderSp500 = document.getElementById('qrLoaderSp500');
-            const qrImageSp500 = document.getElementById('qrImageSp500');
-            if (qrLoaderSp500 && qrImageSp500) {
-                qrLoaderSp500.style.display = 'none';
-                const waLinkSp500 = encodeURIComponent("https://chat.whatsapp.com/CJVb20tuP5XLipAsG0xHib?s=cl&p=a&mlu=4");
-                qrImageSp500.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${waLinkSp500}`;
-                qrImageSp500.style.display = 'block';
-            }
-        }, 1500);
+        }, 800);
     </script>
 </body>
 
